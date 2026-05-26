@@ -8,6 +8,12 @@ The application focuses on simplicity, readability, and low-friction communicati
 
 ---
 
+# Current Status
+* Basic UI
+* Demo text display
+* Animations
+
+
 # Core Goals
 
 ## Translation Directions
