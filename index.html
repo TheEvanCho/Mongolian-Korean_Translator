@@ -7,7 +7,7 @@
     <title>번역 허브</title>
 
     <style>
-        html,
+                html,
         body {
             margin: 0;
             height: 100%;
@@ -17,7 +17,7 @@
             color: #111827;
         }
 
-        #app {
+                #app {
             height: 100%;
             position: relative;
             display: flex;
@@ -33,7 +33,7 @@
             top: 8%;
             left: 50%;
             transform: translateX(-50%);
-    
+
             width: 90%;
             max-height: 5.2em;
 
@@ -57,14 +57,14 @@
             top: 70%;
             left: 0;
             width: 100%;
-            height: 60px;
+            min-height: 60px;
 
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        #line {
+                #line {
             position: absolute;
             width: 100%;
             height: 1.5px;
@@ -76,16 +76,71 @@
         }
 
         /* mode button */
-        #swap {
+        /* BOTH BUTTONS */
+        .controlBtn {
             position: relative;
             z-index: 2;
-            padding: 10px 14px;
+
+            padding: 16px 22px;
+
             border-radius: 999px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+
             color: #0F172A;
-            font-size: 14px;
+
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+
+            cursor: pointer;
+
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+
+            box-shadow:
+                0 4px 14px rgba(15, 23, 42, 0.06),
+                0 1px 3px rgba(15, 23, 42, 0.04);
+
+            transition:
+                transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+                background 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        
+        .controlBtn:active {
+            transform: scale(0.97);
+        }
+
+        /* flip button */
+        .flip {
+            width: 58px;
+            height: 58px;
+
+            padding: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 24px;
+
+            transition:
+                transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+                background 0.2s ease;
+        }
+
+                #swapText {
+            display: inline-block;
+
+            transition:
+                transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                opacity 0.2s ease;
+
+            transform-origin: center;
         }
 
         /* BOTTOM: transcript */
@@ -100,28 +155,31 @@
             font-size: 16px;
             opacity: 0.55;
             min-height: 60px;
-            }
+        }
 
-        .recording #swap {
+                .recording #swap {
             animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
             0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+                box-shadow:
+                    0 4px 14px rgba(15, 23, 42, 0.06),
+                    0 1px 3px rgba(15, 23, 42, 0.04);
             }
 
             50% {
-                transform: scale(1.04);
-                box-shadow: 0 0 10px rgba(51, 71, 79, 0.1);
+                box-shadow:
+                    0 8px 28px rgba(56, 189, 248, 0.22),
+                    0 2px 8px rgba(56, 189, 248, 0.10);
             }
 
             100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+                box-shadow:
+                    0 4px 14px rgba(15, 23, 42, 0.06),
+                    0 1px 3px rgba(15, 23, 42, 0.04);
             }
-    }
+        }
     </style>
 </head>
 
@@ -136,8 +194,11 @@
         <div id="horizon">
             <div id="line"></div>
             <div style="display:flex; gap:10px; align-items:center; z-index:2;">
-                <button id="swap">한국어 → Монгол</button>
-                <button id="flipBtn">⇅</button>      </div>
+                                <button id="swap" class="controlBtn">
+                    <span id="swapText">한국어 → Монгол</span>
+                </button>
+                
+                                <button id="flipBtn" class="controlBtn flip">⇅</button>                  </div>
         </div>
 
         <!-- BOTTOM -->
@@ -146,18 +207,18 @@
     </div>
 
     <script>
-        let isRecording = false;
+                let isRecording = false;
         let mode = "한국어 → Монгол";
         let isFlipped = false;
-
+        
         const MAX_CHARS = 30;
 
-        const flipBtn = document.getElementById("flipBtn");
+                const flipBtn = document.getElementById("flipBtn");
         const app = document.getElementById("app");
         const translated = document.getElementById("translated");
         const transcript = document.getElementById("transcript");
         const swap = document.getElementById("swap");
-
+        
         let demo = [
             "어디에 기차역이 있나요",
             "길을 찾고 있어요",
@@ -173,7 +234,8 @@
 
         /* tap anywhere */
         app.addEventListener("click", (e) => {
-            if (e.target.id === "swap") return;
+            if (e.target.id === "swap" || e.target.id === "swapText" || e.target.id === "flipBtn") 
+                return;
 
             isRecording = !isRecording;
 
@@ -188,30 +250,50 @@
         });
 
         /* mode switch ONLY here */
+        const swapText = document.getElementById("swapText");
+
         swap.addEventListener("click", (e) => {
             e.stopPropagation();
 
-            if (mode === "한국어 → Монгол") mode = "Монгол → 한국어";
-            else if (mode === "Монгол → 한국어") mode = "한국어 → Монгол";
-            else mode = "한국어 → Монгол";
+            /* collapse text */
+            swapText.style.transform = "scaleX(0)";
+            swapText.style.opacity = "0";
 
-            swap.textContent = mode;
+            setTimeout(() => {
+                
+                    /* change                 mode invisibly */
+                    if (mode === "한국어 → Монгол") {
+                        mode = "Монгол → 한국어";
+                    } else {
+                        mode = "한국어 → Монгол";
+}
+
+                swapText.textContent = mode;
+
+                /* expand text back */
+                swapText.style.transform = "scaleX(1)";
+                swapText.style.opacity = "1";
+
+            }, 180);
         });
 
         let rotation = 0;
+            let btnRotation = 0;
+
         flipBtn.addEventListener("click", (e) => {
             e.stopPropagation();
 
+            /* text flips */
             rotation += 180;
-            translated.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            translated.style.transform =
+`translateX(-50%) rotate(${rotation}deg)`;
+
+            /* button spins */
+            btnRotation += 180;
+            flipBtn.style.transform =
+`rotate(${btnRotation}deg)`;
 
             isFlipped = !isFlipped;
-
-            if (isFlipped) {
-                flipBtn.textContent = "⇅✓";
-            } else {
-                flipBtn.textContent = "⇅";
-            }
         });
 
         /* speech loop */
@@ -221,10 +303,10 @@
             const line = demo[i % demo.length];
             i++;
 
-            function cropText(text) {
-                if (text.length <= MAX_CHARS) return text;
-                return "..." + text.slice(text.length - MAX_CHARS, text.length);
-            }
+        function cropText(text) {
+            if (text.length <= MAX_CHARS) return text;
+            return "..." + text.slice(text.length - MAX_CHARS, text.length);
+        }
 
             transcript.textContent = cropText(line);
             translated.textContent = cropText(line);
