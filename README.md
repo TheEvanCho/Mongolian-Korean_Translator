@@ -8,6 +8,8 @@ The application focuses on simplicity, readability, and low-friction communicati
 
 ---
 
+<br>
+
 # Current Status
 * Basic UI
 * Demo text display
