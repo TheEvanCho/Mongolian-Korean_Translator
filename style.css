@@ -1,35 +1,118 @@
 body {
     margin: 0;
-    background: #0b0f14;
-    color: white;
-    font-family: Arial;
+    background: #F7FAFF;
+    color: #0B1220;
+    font-family: Arial, sans-serif;
+
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start;
+
+    padding: 20px;
+
+    min-height: 100vh;
+    padding-top: 40px;
 }
 
+/* MAIN APP */
 #app {
     text-align: center;
-    width: 80%;
+    width: 100%;
+    max-width: 720px;
 }
 
-button {
-    padding: 14px 24px;
-    font-size: 20px;
+/* CONTROLS */
+#controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+/* SEGMENTED TOGGLE BAR */
+#modeToggle {
+    display: flex;
+    background: #e5e7eb;
+    padding: 6px;
+    border-radius: 14px;
+    gap: 6px;
+}
+
+/* MODE BUTTONS */
+.mode {
     border: none;
-    border-radius: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
     cursor: pointer;
+
+    background: transparent;
+    color: #0B1220;
+    opacity: 0.6;
+
+    transition: 0.2s ease;
+    white-space: nowrap;
 }
 
+.mode.active {
+    background: white;
+    opacity: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.mode:active {
+    transform: scale(0.97);
+}
+
+/* MAIN BUTTON */
+button#startBtn {
+    margin-top: 4px;
+    padding: 16px 28px;
+    font-size: 18px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: #0B1220;
+    color: white;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+button#startBtn:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    opacity: 0.5;
+}
+
+/* STATUS */
+#status {
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+/* SUBTITLES AREA */
 #subtitles {
-    margin-top: 40px;
+    margin-top: 42px;
+
+    padding: 0 12px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
+/* ORIGINAL TEXT */
 #original {
-    font-size: 28px;
+    font-size: clamp(16px, 4.5vw, 22px);
+    opacity: 0.7;
 }
 
+/* TRANSLATED TEXT (HERO OUTPUT) */
 #translated {
-    font-size: 32px;
-    color: #7dd3fc; }
+    font-size: clamp(22px, 6vw, 36px);
+    color: #2563eb;
+}
