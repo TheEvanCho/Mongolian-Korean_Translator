@@ -1,0 +1,35 @@
+body {
+    margin: 0;
+    background: #0b0f14;
+    color: white;
+    font-family: Arial;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#app {
+    text-align: center;
+    width: 80%;
+}
+
+button {
+    padding: 14px 24px;
+    font-size: 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+#subtitles {
+    margin-top: 40px;
+}
+
+#original {
+    font-size: 28px;
+}
+
+#translated {
+    font-size: 32px;
+    color: #7dd3fc; }
