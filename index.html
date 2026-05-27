@@ -91,6 +91,12 @@
             font-size: 22px;
         }
 
+        .micIcon {
+            width: 42px;
+            height: 42px;
+            scale: 2;
+        }
+
         .mic.active {
             background: #38BDF8;
             color: white;
@@ -128,7 +134,7 @@
 
             <div style="display:flex; gap:10px; align-items:center; z-index:2;">
                 <button id="micBtn" class="controlBtn mic">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentColor">
+                    <svg class="micIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
                 
                         <path d="M395-435q-35-35-35-85v-240q0-50
                                                  35-85t85-35q50 0 85 35t35 85v240
