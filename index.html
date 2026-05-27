@@ -41,9 +41,11 @@
             overflow: hidden;
             white-space: pre-wrap;
             color: #111827;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         #horizon {
+            margin-bottom: auto;
             position: absolute;
             top: 70%;
             left: 0;
@@ -59,19 +61,25 @@
             width: 100%;
             height: 1.5px;
             background: rgba(56, 189, 248, 0.45);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
             top: 50%;
             transform: translateY(-50%);
             border-radius: 999px;
         }
 
         .controlBtn {
+            position: relative;
+            z-index: 2;
             padding: 16px 22px;
             border-radius: 999px;
             border: 1px solid rgba(255, 255, 255, 0.35);
             background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(12px);
-            cursor: pointer;
+            color: #0F172A;
             font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
         }
 
         .mic {
@@ -80,11 +88,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 22px;
         }
 
         .mic.active {
             background: #38BDF8;
             color: white;
+            box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
         }
 
         #transcript {
@@ -95,7 +105,14 @@
             width: 90%;
             text-align: center;
             font-size: 16px;
-            opacity: 0.6;
+            opacity: 0.55;
+            min-height: 60px;
+        }
+
+        #swapText {
+            display: inline-block;
+            transition: transform 0.35s ease, opacity 0.2s ease;
+            transform-origin: center;
         }
     </style>
 </head>
@@ -109,9 +126,27 @@
         <div id="horizon">
             <div id="line"></div>
 
-            <button id="micBtn" class="controlBtn mic">
-                🎤
-            </button>
+            <div style="display:flex; gap:10px; align-items:center; z-index:2;">
+                <button id="micBtn" class="controlBtn mic">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentColor">
+                
+                        <path d="M395-435q-35-35-35-85v-240q0-50
+                                                 35-85t85-35q50 0 85 35t35 85v240
+                                                 q0 50-35 85t-85 35q-50 0-85-35Zm85-205Zm-40
+                                                 520v-123q-104-14-172-93t-68-184h80q0
+                                                 83 58.5 141.5T480-320q83 0
+                                                 141.5-58.5T680-520h80q0
+                                                 105-68 184t-172 93v123h-80Zm68.5-371.5Q520-503
+                                                 520-520v-240q0-17-11.5-28.5T480-800q-17
+                                                 0-28.5 11.5T440-760v240q0 17
+                                                 11.5 28.5T480-480q17 0
+                                                 28.5-11.5Z" />
+                    </svg>       </button>
+
+                <button id="swap" class="controlBtn">
+                    <span id="swapText">한국어 → Монгол</span>
+                </button>
+            </div>
         </div>
 
         <div id="transcript">...</div>
@@ -119,6 +154,9 @@
     </div>
 
     <script>
+        /* =========================
+           STATE
+        ========================= */
         let isRecording = false;
 
         let mediaStream;
@@ -131,9 +169,16 @@
         const micBtn = document.getElementById("micBtn");
         const transcript = document.getElementById("transcript");
         const translated = document.getElementById("translated");
+        const swap = document.getElementById("swap");
+        const swapText = document.getElementById("swapText");
 
+        let mode = "한국어 → Монгол";
+
+        /* =========================
+           CLICK CONTROL
+        ========================= */
         app.addEventListener("click", async (e) => {
-            if (e.target.id !== "micBtn") return;
+            if (e.target.id === "swap" || e.target.id === "swapText") return;
 
             isRecording = !isRecording;
 
@@ -149,9 +194,32 @@
             }
         });
 
+        /* =========================
+           MODE SWAP (UNCHANGED UI)
+        ========================= */
+        swap.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            swapText.style.transform = "scaleX(0)";
+            swapText.style.opacity = "0";
+
+            setTimeout(() => {
+                mode = (mode === "한국어 → Монгол")
+                    ? "Монгол → 한국어"
+                    : "한국어 → Монгол";
+
+                swapText.textContent = mode;
+
+                swapText.style.transform = "scaleX(1)";
+                swapText.style.opacity = "1";
+            }, 180);
+        });
+
+        /* =========================
+           MIC ENGINE
+        ========================= */
         async function startMicLoop() {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
             runCycle();
         }
 
