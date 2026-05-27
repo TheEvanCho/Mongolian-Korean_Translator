@@ -7,7 +7,7 @@
     <title>번역 허브</title>
 
     <style>
-                html,
+        html,
         body {
             margin: 0;
             height: 100%;
@@ -17,7 +17,7 @@
             color: #111827;
         }
 
-                #app {
+        #app {
             height: 100%;
             position: relative;
             display: flex;
@@ -27,155 +27,66 @@
             box-sizing: border-box;
         }
 
-        /* TOP: translation ONLY */
         #translated {
             position: absolute;
             top: 8%;
             left: 50%;
             transform: translateX(-50%);
-
             width: 90%;
             max-height: 5.2em;
-
             font-size: 32px;
             font-weight: 500;
             text-align: center;
             line-height: 1.3;
-
             overflow: hidden;
             white-space: pre-wrap;
-
             color: #111827;
-
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* CENTER BAR */
         #horizon {
-            margin-bottom: auto;
             position: absolute;
             top: 70%;
             left: 0;
             width: 100%;
             min-height: 60px;
-
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-                #line {
+        #line {
             position: absolute;
             width: 100%;
             height: 1.5px;
             background: rgba(56, 189, 248, 0.45);
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
             top: 50%;
             transform: translateY(-50%);
             border-radius: 999px;
         }
 
-        /* mode button */
-        /* BOTH BUTTONS */
         .controlBtn {
-            position: relative;
-            z-index: 2;
-
             padding: 16px 22px;
-
             border-radius: 999px;
             border: 1px solid rgba(255, 255, 255, 0.35);
-
             background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(12px);
-
-            color: #0F172A;
-
-            font-size: 18px;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-
             cursor: pointer;
-
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-
-            box-shadow:
-                0 4px 14px rgba(15, 23, 42, 0.06),
-                0 1px 3px rgba(15, 23, 42, 0.04);
-
-            transition:
-                transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-                background 0.25s ease,
-                box-shadow 0.25s ease;
-        }
-
-        
-        .controlBtn:active {
-            transform: scale(0.97);
+            font-size: 18px;
         }
 
         .mic {
             width: 58px;
             height: 58px;
-
-            padding: 0;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
-            font-size: 22px;
-
-            transition:
-                background 0.25s ease,
-                color 0.25s ease,
-                transform 0.25s ease,
-                box-shadow 0.25s ease;
-            
-            box-shadow:
-                0 4px 14px rgba(15, 23, 42, 0.06),
-                0 1px 3px rgba(15, 23, 42, 0.04);
         }
-        
+
         .mic.active {
             background: #38BDF8;
             color: white;
-
-            box-shadow:
-                0 8px 24px rgba(56, 189, 248, 0.35),
-                0 2px 8px rgba(56, 189, 248, 0.2);
         }
 
-        /* flip button */
-        .flip {
-            width: 58px;
-            height: 58px;
-
-            padding: 0;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 24px;
-
-            transition:
-                transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
-                background 0.2s ease;
-        }
-
-                #swapText {
-            display: inline-block;
-
-            transition:
-                transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-                opacity 0.2s ease;
-
-            transform-origin: center;
-        }
-
-        /* BOTTOM: transcript */
         #transcript {
             position: absolute;
             bottom: 8%;
@@ -183,34 +94,8 @@
             transform: translateX(-50%);
             width: 90%;
             text-align: center;
-
             font-size: 16px;
-            opacity: 0.55;
-            min-height: 60px;
-        }
-
-                .recording #swap {
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow:
-                    0 4px 14px rgba(15, 23, 42, 0.06),
-                    0 1px 3px rgba(15, 23, 42, 0.04);
-            }
-
-            50% {
-                box-shadow:
-                    0 8px 28px rgba(56, 189, 248, 0.22),
-                    0 2px 8px rgba(56, 189, 248, 0.10);
-            }
-
-            100% {
-                box-shadow:
-                    0 4px 14px rgba(15, 23, 42, 0.06),
-                    0 1px 3px rgba(15, 23, 42, 0.04);
-            }
+            opacity: 0.6;
         }
     </style>
 </head>
@@ -219,120 +104,104 @@
 
     <div id="app">
 
-        <!-- TOP -->
         <div id="translated">번역 허브</div>
 
-        <!-- CENTER -->
         <div id="horizon">
             <div id="line"></div>
-            <div style="display:flex; gap:10px; align-items:center; z-index:2;">
-                <button id="micBtn" class="controlBtn mic">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentColor">
-                        <path
-                            d="M395-435q-35-35-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35q-50 0-85-35Zm85-205Zm-40 520v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Zm68.5-371.5Q520-503 520-520v-240q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v240q0 17 11.5 28.5T480-480q17 0 28.5-11.5Z" />
-                    </svg>
-                </button>
-                
-                <button id="swap" class="controlBtn">
-                    <span id="swapText">한국어 → Монгол</span>
-                </button>
-            </div>
+
+            <button id="micBtn" class="controlBtn mic">
+                🎤
+            </button>
         </div>
 
-        <!-- BOTTOM -->
         <div id="transcript">...</div>
 
     </div>
 
     <script>
-                let isRecording = false;
-        let mode = "한국어 → Монгол";
-        
-        const MAX_CHARS = 30;
+        let isRecording = false;
+
+        let mediaStream;
+        let recorder;
+        let chunks = [];
+
+        const CHUNK_TIME = 4000;
 
         const app = document.getElementById("app");
-        const translated = document.getElementById("translated");
-        const transcript = document.getElementById("transcript");
-        const swap = document.getElementById("swap");
         const micBtn = document.getElementById("micBtn");
-        
-        let demo = [
-            "어디에 기차역이 있나요",
-            "길을 찾고 있어요",
-            "여기서 얼마나 멀어요",
-            "감사합니다",
-            "어마어마하게 긴 문장으로 테스트해봅시다. 과연 어떻게 보이는지 궁금하네요. 이 문장은 번역된 텍스트가 길어질 때 어떻게 처리되는지 보여주기 위해 작성되었습니다. 과연 줄바꿈이 잘 되는지, 그리고 전체적인 레이아웃이 어떻게 유지되는지 확인해봅시다.",
-            "Сайн уу?",
-            "Энэ бол туршилтын өгүүлбэр юм.",
-            "Орчуулга хэрхэн харагдаж байгааг шалгахын тулд урт өгүүлбэр бичсэн. Энэ нь текст хэрхэн зохицож байгааг, мөн дизайн элементүүд хэрхэн хадгалагдаж байгааг шалгах болно."
-        ];
+        const transcript = document.getElementById("transcript");
+        const translated = document.getElementById("translated");
 
-        let i = 0;
-
-        /* tap anywhere */
-        app.addEventListener("click", (e) => {
-            if (e.target.id === "swap" || e.target.id === "swapText") 
-                return;
+        app.addEventListener("click", async (e) => {
+            if (e.target.id !== "micBtn") return;
 
             isRecording = !isRecording;
 
             if (isRecording) {
                 micBtn.classList.add("active");
-                app.classList.add("recording");
-                transcript.textContent = "듣는 중...";
-                loopSpeech();
+                transcript.textContent = "듣는 중... 🎤";
+
+                await startMicLoop();
             } else {
                 micBtn.classList.remove("active");
-                app.classList.remove("recording");
-                transcript.textContent = "정지";
+                transcript.textContent = "정지 💤";
+                stopMicLoop();
             }
         });
 
-        /* mode switch ONLY here */
-        const swapText = document.getElementById("swapText");
+        async function startMicLoop() {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        swap.addEventListener("click", (e) => {
-            e.stopPropagation();
-
-            /* collapse text */
-            swapText.style.transform = "scaleX(0)";
-            swapText.style.opacity = "0";
-
-            setTimeout(() => {
-                
-                    /* change                 mode invisibly */
-                    if (mode === "한국어 → Монгол") {
-                        mode = "Монгол → 한국어";
-                    } else {
-                        mode = "한국어 → Монгол";
-}
-
-                swapText.textContent = mode;
-
-                /* expand text back */
-                swapText.style.transform = "scaleX(1)";
-                swapText.style.opacity = "1";
-
-            }, 180);
-        });
-
-
-        /* speech loop */
-        function loopSpeech() {
-            if (!isRecording) return;
-
-            const line = demo[i % demo.length];
-            i++;
-
-        function cropText(text) {
-            if (text.length <= MAX_CHARS) return text;
-            return "..." + text.slice(text.length - MAX_CHARS, text.length);
+            runCycle();
         }
 
-            transcript.textContent = cropText(line);
-            translated.textContent = cropText(line);
+        function runCycle() {
+            if (!isRecording) return;
 
-            setTimeout(loopSpeech, 2000);
+            chunks = [];
+            recorder = new MediaRecorder(mediaStream);
+
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) chunks.push(e.data);
+            };
+
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: "audio/webm" });
+                playAndRepeat(blob);
+            };
+
+            recorder.start();
+
+            setTimeout(() => {
+                if (recorder.state === "recording") {
+                    recorder.stop();
+                }
+            }, CHUNK_TIME);
+        }
+
+        function playAndRepeat(blob) {
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+
+            audio.onended = () => {
+                URL.revokeObjectURL(url);
+
+                if (isRecording) {
+                    runCycle();
+                }
+            };
+
+            audio.play();
+        }
+
+        function stopMicLoop() {
+            isRecording = false;
+
+            mediaStream?.getTracks().forEach(t => t.stop());
+
+            if (recorder && recorder.state === "recording") {
+                recorder.stop();
+            }
         }
     </script>
 
