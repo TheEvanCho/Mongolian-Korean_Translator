@@ -132,6 +132,10 @@
                 color 0.25s ease,
                 transform 0.25s ease,
                 box-shadow 0.25s ease;
+            
+            box-shadow:
+                0 4px 14px rgba(15, 23, 42, 0.06),
+                0 1px 3px rgba(15, 23, 42, 0.04);
         }
         
         .mic.active {
@@ -232,8 +236,7 @@
                 <button id="swap" class="controlBtn">
                     <span id="swapText">한국어 → Монгол</span>
                 </button>
-                
-                <button id="flipBtn" class="controlBtn flip">⇅</button>                  </div>
+            </div>
         </div>
 
         <!-- BOTTOM -->
@@ -244,11 +247,9 @@
     <script>
                 let isRecording = false;
         let mode = "한국어 → Монгол";
-        let isFlipped = false;
         
         const MAX_CHARS = 30;
 
-                const flipBtn = document.getElementById("flipBtn");
         const app = document.getElementById("app");
         const translated = document.getElementById("translated");
         const transcript = document.getElementById("transcript");
@@ -270,7 +271,7 @@
 
         /* tap anywhere */
         app.addEventListener("click", (e) => {
-            if (e.target.id === "swap" || e.target.id === "swapText" || e.target.id === "flipBtn") 
+            if (e.target.id === "swap" || e.target.id === "swapText") 
                 return;
 
             isRecording = !isRecording;
@@ -315,24 +316,6 @@
             }, 180);
         });
 
-        let rotation = 0;
-            let btnRotation = 0;
-
-        flipBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-
-            /* text flips */
-            rotation += 180;
-            translated.style.transform =
-`translateX(-50%) rotate(${rotation}deg)`;
-
-            /* button spins */
-            btnRotation += 180;
-            flipBtn.style.transform =
-`rotate(${btnRotation}deg)`;
-
-            isFlipped = !isFlipped;
-        });
 
         /* speech loop */
         function loopSpeech() {
