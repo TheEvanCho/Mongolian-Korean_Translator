@@ -254,19 +254,21 @@
         }
 
         function playAndRepeat(blob) {
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
 
-            audio.onended = () => {
-                URL.revokeObjectURL(url);
+                audio.onended = () => {
+                    URL.revokeObjectURL(url);
 
-                if (isRecording) {
-                    runCycle();
-                }
-            };
+                    if (isRecording) {
+                        runCycle();
+                    }
+                };
 
-            audio.play();
-        }
+                audio.play().catch(err => {
+                    console.log("Playback interrupted:", err);
+                });
+            }
 
         function stopMicLoop() {
             isRecording = false;
