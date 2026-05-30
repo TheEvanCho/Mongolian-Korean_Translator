@@ -245,7 +245,11 @@
                 console.log("=== NEW CHUNK ===");
                 console.log("Size:", blob.size, "bytes");
                 console.log("Type:", blob.type);
-                console.log(blob);
+
+                const url = URL.createObjectURL(blob);
+
+                console.log("Audio URL:");
+                console.log(url);
 
                 transcript.textContent =
                     `Chunk captured (${Math.round(blob.size / 1024)} KB)`;
