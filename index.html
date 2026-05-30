@@ -169,6 +169,10 @@
         let recorder;
         let chunks = [];
 
+        let recentChunks = [];
+        let chunkCounter = 0;
+        
+        const WINDOW_SIZE = 3;
         const CHUNK_TIME = 3000;
 
         const app = document.getElementById("app");
@@ -225,48 +229,55 @@
            MIC ENGINE
         ========================= */
         async function startMicLoop() {
-            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            runCycle();
-        }
+                mediaStream =
+                    await navigator.mediaDevices.getUserMedia({
+                        audio: true
+                    });
+
+                runCycle();
+            }
 
         function runCycle() {
-            if (!isRecording) return;
+                recentChunks = [];
 
-            chunks = [];
-            recorder = new MediaRecorder(mediaStream);
+                recorder = new MediaRecorder(mediaStream);
 
-            recorder.ondataavailable = (e) => {
-                if (e.data.size > 0) chunks.push(e.data);
-            };
+                recorder.ondataavailable = (e) => {
+                    if (e.data.size === 0) return;
 
-            recorder.onstop = () => {
-                const blob = new Blob(chunks, { type: "audio/webm" });
+                    recentChunks.push(e.data);
 
-                console.log("=== NEW CHUNK ===");
-                console.log("Size:", blob.size, "bytes");
-                console.log("Type:", blob.type);
+                    if (recentChunks.length > WINDOW_SIZE) {
+                        recentChunks.shift();
+                    }
 
-                const url = URL.createObjectURL(blob);
+                    chunkCounter++;
 
-                console.log("Audio URL:");
-                console.log(url);
+                    const blob = new Blob(
+                        recentChunks,
+                        { type: "audio/webm" }
+                    );
 
-                transcript.textContent =
-                    `Chunk captured (${Math.round(blob.size / 1024)} KB)`;
+                    console.log(
+                        `Window ${chunkCounter}`
+                    );
 
-                if (isRecording) {
-                    runCycle();
-                }
-            };
+                    console.log(
+                        "Chunks:",
+                        recentChunks.length
+                    );
 
-            recorder.start();
+                    console.log(
+                        "Size:",
+                        blob.size
+                    );
 
-            setTimeout(() => {
-                if (recorder.state === "recording") {
-                    recorder.stop();
-                }
-            }, CHUNK_TIME);
-        }
+                    transcript.textContent =
+                        `Window ${chunkCounter}`;
+                };
+
+                recorder.start(1000);
+            }
 
         /* function playAndRepeat(blob) {  //blobbbbbb
                 const url = URL.createObjectURL(blob);
@@ -285,15 +296,14 @@
                 });
             } */
 
-        function stopMicLoop() {
-            isRecording = false;
+            function stopMicLoop() {
+                    isRecording = false;
 
-            mediaStream?.getTracks().forEach(t => t.stop());
+                    recorder?.stop();
 
-            if (recorder && recorder.state === "recording") {
-                recorder.stop();
-            }
-        }
+                    mediaStream?.getTracks()
+                        .forEach(t => t.stop());
+                }
     </script>
 
 </body>
