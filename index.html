@@ -180,6 +180,14 @@
 
         let mode = "한국어 → Монгол";
 
+        // for testing: array of words
+        const fakeWords = [
+                "hello", "testing", "audio", "microphone", "translation",
+                "banana", "airplane", "sky", "cloud", "signal",
+                "neural", "speech", "whisper", "chunk", "stream",
+                "korean", "mongolian", "latency", "pipeline", "flutter"
+            ];
+
         /* =========================
            CLICK CONTROL
         ========================= */
@@ -239,24 +247,20 @@
                 if (e.data.size > 0) chunks.push(e.data);
             };
 
-            recorder.onstop = () => {
+            recorder.onstop = async () => {
                 const blob = new Blob(chunks, { type: "audio/webm" });
 
-                console.log("=== NEW CHUNK ===");
-                console.log("Size:", blob.size, "bytes");
-                console.log("Type:", blob.type);
+                const text = await runWhisper(blob);
 
-                const url = URL.createObjectURL(blob);
+                // 🎤 transcript (fake whisper output)
+                transcript.textContent = text;
 
-                console.log("Audio URL:");
-                console.log(url);
+                // 🌍 translation placeholder
+                translated.textContent = "no NLLB yet 🧊";
 
-                transcript.textContent =
-                    `Chunk captured (${Math.round(blob.size / 1024)} KB)`;
+                console.log("FAKE TRANSCRIPT:", text);
 
-                if (isRecording) {
-                    runCycle();
-                }
+                if (isRecording) runCycle();
             };
 
             recorder.start();
@@ -294,6 +298,23 @@
                 recorder.stop();
             }
         }
+
+        async function runWhisper(blob) {
+                console.log("fake whisper received blob:", blob.size);
+
+                // pretend processing delay (feels real 👀)
+                await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
+
+                const count = 4 + Math.floor(Math.random() * 6);
+
+                let result = [];
+                for (let i = 0; i < count; i++) {
+                    const word = fakeWords[Math.floor(Math.random() * fakeWords.length)];
+                    result.push(word);
+                }
+
+                return result.join(" ");
+            }
     </script>
 
 </body>
