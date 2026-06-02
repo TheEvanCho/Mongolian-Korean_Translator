@@ -178,6 +178,9 @@
         const swap = document.getElementById("swap");
         const swapText = document.getElementById("swapText");
 
+        let fullTranscriptWords = [];   //only show MAX_WORDS number of words in the transcript to make it look cleaner
+        const MAX_WORDS = 20;
+
         let mode = "한국어 → Монгол";
 
         // for testing: array of words
@@ -253,10 +256,25 @@
 
                 const text = await runWhisper(blob);
 
-                // 🎤 transcript (fake whisper output)
-                transcript.textContent = text;  //COMMENT: will probably need to be += text to add to the previous texts, and cap the total length.
+                // split new words
+                const newWords = text.split(" ");
 
-                // 🌍 translation placeholder
+                // append
+                fullTranscriptWords.push(...newWords);
+
+                // keep ONLY last 20 words
+                if (fullTranscriptWords.length > MAX_WORDS) {
+                    fullTranscriptWords = fullTranscriptWords.slice(-MAX_WORDS);
+                }
+
+                // update UI
+                transcript.style.opacity = 0.6;
+
+                setTimeout(() => {
+                    transcript.textContent = fullTranscriptWords.join(" ");
+                    transcript.style.opacity = 1;
+                }, 80);
+
                 translated.textContent = "no NLLB yet 🧊";
 
                 console.log("FAKE TRANSCRIPT:", text);
