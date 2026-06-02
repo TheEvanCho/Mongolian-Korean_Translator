@@ -179,7 +179,7 @@
         const swapText = document.getElementById("swapText");
 
         let fullTranscriptWords = [];   //only show MAX_WORDS number of words in the transcript to make it look cleaner
-        const MAX_WORDS = 20;
+        const MAX_WORDS = 10;
 
         let mode = "한국어 → Монгол";
 
@@ -262,7 +262,7 @@
                 // append
                 fullTranscriptWords.push(...newWords);
 
-                // keep ONLY last 20 words
+                // keep ONLY last MAX_WORDS number of words
                 if (fullTranscriptWords.length > MAX_WORDS) {
                     fullTranscriptWords = fullTranscriptWords.slice(-MAX_WORDS);
                 }
