@@ -253,7 +253,7 @@
                 const text = await runWhisper(blob);
 
                 // 🎤 transcript (fake whisper output)
-                transcript.textContent = text;
+                transcript.textContent = text;  //COMMENT: will probably need to be += text to add to the previous texts, and cap the total length.
 
                 // 🌍 translation placeholder
                 translated.textContent = "no NLLB yet 🧊";
