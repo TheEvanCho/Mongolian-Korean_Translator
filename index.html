@@ -169,7 +169,7 @@
         let recorder;
         let chunks = [];
 
-        const CHUNK_TIME = 3000;
+        const CHUNK_TIME = 1000;
 
         const app = document.getElementById("app");
         const micBtn = document.getElementById("micBtn");
@@ -185,7 +185,8 @@
                 "hello", "testing", "audio", "microphone", "translation",
                 "banana", "airplane", "sky", "cloud", "signal",
                 "neural", "speech", "whisper", "chunk", "stream",
-                "korean", "mongolian", "latency", "pipeline", "flutter"
+                "korean", "mongolian", "latency", "pipeline", "flutter",
+                "I am", "lorem ipsum", "openai", "mongolian", "korean", "translate"
             ];
 
         /* =========================
@@ -305,7 +306,7 @@
                 // pretend processing delay (feels real 👀)
                 await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
 
-                const count = 4 + Math.floor(Math.random() * 6);
+                const count = 2 + Math.floor(Math.random() * 3);
 
                 let result = [];
                 for (let i = 0; i < count; i++) {
