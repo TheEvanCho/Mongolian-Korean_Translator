@@ -164,6 +164,7 @@
            STATE
         ========================= */
         let isRecording = false;
+        let stopRequested = false;
 
         let mediaStream;
         let recorder;
@@ -201,13 +202,15 @@
             isRecording = !isRecording;
 
             if (isRecording) {
+                stopRequested = false;
                 micBtn.classList.add("active");
                 transcript.textContent = "듣는 중... 🎤";
+                
 
                 await startMicLoop();
             } else {
+                stopRequested = true;
                 micBtn.classList.remove("active");
-                transcript.textContent = "정지 💤";
                 stopMicLoop();
             }
         });
@@ -273,6 +276,13 @@
                 setTimeout(() => {
                     transcript.textContent = fullTranscriptWords.join(" ");
                     transcript.style.opacity = 1;
+
+                    if (!isRecording) {
+                        setTimeout(() => {
+                            transcript.textContent = "정지 💤";
+                        }, 1500);
+                    }
+
                 }, 80);
 
                 translated.textContent = "no NLLB yet 🧊";
