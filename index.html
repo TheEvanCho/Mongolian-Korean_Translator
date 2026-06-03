@@ -159,7 +159,11 @@
 
     </div>
 
-    <script>
+    <script type=module>
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
+        let whisper;
+
+
         /* =========================
            STATE
         ========================= */
@@ -170,7 +174,7 @@
         let recorder;
         let chunks = [];
 
-        const CHUNK_TIME = 1000;
+        const CHUNK_TIME = 2000;
 
         const app = document.getElementById("app");
         const micBtn = document.getElementById("micBtn");
@@ -183,6 +187,20 @@
         const MAX_WORDS = 10;
 
         let mode = "한국어 → Монгол";
+
+        async function loadWhisper() {
+
+                transcript.textContent = "Loading Whisper Base...";
+
+                whisper = await pipeline(
+                    "automatic-speech-recognition",
+                    "Xenova/whisper-base"
+                );
+
+                transcript.textContent = "Ready ✨";
+            }
+
+            await loadWhisper();
 
         // for testing: array of words
         const fakeWords = [
@@ -329,20 +347,30 @@
         }
 
         async function runWhisper(blob) {
-                console.log("fake whisper received blob:", blob.size);
 
-                // pretend processing delay (feels real 👀)
-                await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
+                const arrayBuffer = await blob.arrayBuffer();
 
-                const count = 2 + Math.floor(Math.random() * 3);
+                const audioContext = new AudioContext();
 
-                let result = [];
-                for (let i = 0; i < count; i++) {
-                    const word = fakeWords[Math.floor(Math.random() * fakeWords.length)];
-                    result.push(word);
-                }
+                const audioBuffer =
+                    await audioContext.decodeAudioData(arrayBuffer);
 
-                return result.join(" ");
+                const samples =
+                    audioBuffer.getChannelData(0);
+
+                const language =
+                    mode === "한국어 → Монгол"
+                        ? "ko"
+                        : "mn";
+
+                const result = await whisper(samples, {
+                    language,
+                    task: "transcribe"
+                });
+
+                console.log(result);
+
+                return result.text;
             }
     </script>
 
