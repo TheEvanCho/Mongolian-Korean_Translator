@@ -205,7 +205,7 @@
                 stopRequested = false;
                 micBtn.classList.add("active");
                 transcript.textContent = "듣는 중... 🎤";
-                
+                fullTranscriptWords = [];   // ← add this to clear previous transcript when starting a new recording session
 
                 await startMicLoop();
             } else {
