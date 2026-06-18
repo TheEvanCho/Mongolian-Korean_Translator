@@ -174,8 +174,9 @@
         let recorder;
         let chunks = [];
 
-        const CHUNK_TIME = 2000;
-
+        const CHUNK_TIME = 4000;
+        
+        const audioContext = new AudioContext({ sampleRate: 16000 });
         const app = document.getElementById("app");
         const micBtn = document.getElementById("micBtn");
         const transcript = document.getElementById("transcript");
@@ -190,17 +191,21 @@
 
         async function loadWhisper() {
 
-                transcript.textContent = "Loading Whisper Base...";
+            transcript.textContent = "Loading Whisper Base...";
 
-                whisper = await pipeline(
-                    "automatic-speech-recognition",
-                    "Xenova/whisper-base"
-                );
+            whisper = await pipeline(
+                "automatic-speech-recognition",
+                "Xenova/whisper-base"
+            );
 
-                transcript.textContent = "Ready ✨";
-            }
+            transcript.textContent = "Ready ✨";
+        }
 
+        async function init() {
             await loadWhisper();
+        }
+
+        init();
 
         // for testing: array of words
         const fakeWords = [
@@ -215,6 +220,11 @@
            CLICK CONTROL
         ========================= */
         app.addEventListener("click", async (e) => {
+            if (!whisper) {
+                transcript.textContent = "Model still loading... 🐢";
+                return;
+            }
+            
             if (e.target.id === "swap" || e.target.id === "swapText") return;
 
             isRecording = !isRecording;
@@ -348,30 +358,36 @@
 
         async function runWhisper(blob) {
 
-                const arrayBuffer = await blob.arrayBuffer();
+            const arrayBuffer = await blob.arrayBuffer();
 
-                const audioContext = new AudioContext();
-
-                const audioBuffer =
-                    await audioContext.decodeAudioData(arrayBuffer);
-
-                const samples =
-                    audioBuffer.getChannelData(0);
-
-                const language =
-                    mode === "한국어 → Монгол"
-                        ? "ko"
-                        : "mn";
-
-                const result = await whisper(samples, {
-                    language,
-                    task: "transcribe"
-                });
-
-                console.log(result);
-
-                return result.text;
+            let audioBuffer;
+            try {
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            } catch (e) {
+                console.log("decode failed", e);
+                return "";
             }
+
+            const samples = audioBuffer.getChannelData(0);
+
+            if (!samples || samples.length === 0) {
+                return "";
+            }
+
+            const language =
+                mode === "한국어 → Монгол"
+                    ? "ko"
+                    : "mn";
+
+            const result = await whisper(samples, {
+                language,
+                task: "transcribe"
+            });
+
+            console.log(result);
+
+            return result.text;
+        }
     </script>
 
 </body>
