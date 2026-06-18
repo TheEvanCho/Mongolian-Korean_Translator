@@ -174,7 +174,11 @@
         let recorder;
         let chunks = [];
 
-        const CHUNK_TIME = 4000;
+        const RECORD_CHUNK_MS = 250;
+        const BUFFER_SECONDS = 8;
+        const TRANSCRIBE_EVERY_MS = 1000;
+
+        const rollingChunks = [];
         
         const audioContext = new AudioContext({ sampleRate: 16000 });
         const app = document.getElementById("app");
@@ -264,13 +268,63 @@
             }, 180);
         });
 
+        let whisperTimer;
+        let whisperBusy = false;
+
+        function startWhisperLoop() {
+
+            whisperTimer = setInterval(async () => {
+                if (whisperBusy) return;
+                if (rollingChunks.length === 0) return;
+
+                whisperBusy = true;
+
+                   try {
+
+                   const blob = new Blob(
+                       [...rollingChunks],
+                        { type: "audio/webm" }
+                    );
+
+                    const text = await runWhisper(blob);
+
+                    transcript.textContent = text;
+
+               } finally {
+                    whisperBusy = false;
+                }
+
+            }, TRANSCRIBE_EVERY_MS);
+            }
+
+        
         /* =========================
            MIC ENGINE
         ========================= */
         async function startMicLoop() {
-            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            runCycle();
-        }
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true
+                });
+
+                recorder = new MediaRecorder(mediaStream);
+
+                recorder.ondataavailable = (e) => {
+                    if (!e.data.size) return;
+
+                    rollingChunks.push(e.data);
+
+                    const maxChunks =
+                        BUFFER_SECONDS * (1000 / RECORD_CHUNK_MS);
+
+                    while (rollingChunks.length > maxChunks) {
+                        rollingChunks.shift();
+                    }
+                };
+
+                recorder.start(RECORD_CHUNK_MS);
+
+                startWhisperLoop();
+            }
 
         function runCycle() {
             if (!isRecording) return;
@@ -346,15 +400,19 @@
                 });
             } */
 
-        function stopMicLoop() {
-            isRecording = false;
+            function stopMicLoop() {
 
-            mediaStream?.getTracks().forEach(t => t.stop());
+                isRecording = false;
 
-            if (recorder && recorder.state === "recording") {
-                recorder.stop();
+                clearInterval(whisperTimer);
+
+                recorder?.stop();
+
+                mediaStream?.getTracks()
+                    .forEach(t => t.stop());
+
+                rollingChunks.length = 0;
             }
-        }
 
         async function runWhisper(blob) {
 
