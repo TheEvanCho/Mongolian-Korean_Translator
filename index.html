@@ -312,17 +312,29 @@
                 recorder = new MediaRecorder(mediaStream);
 
                 recorder.ondataavailable = (e) => {
-                    if (!e.data.size) return;
 
-                    rollingChunks.push(e.data);
+                if (!e.data.size) return;
 
-                    const maxChunks =
-                        BUFFER_SECONDS * (1000 / RECORD_CHUNK_MS);
+                console.log(
+                    "chunk",
+                    e.data.size,
+                    "bytes"
+                );
 
-                    while (rollingChunks.length > maxChunks) {
-                        rollingChunks.shift();
-                    }
-                };
+                rollingChunks.push(e.data);
+
+                const maxChunks =
+                    BUFFER_SECONDS * (1000 / RECORD_CHUNK_MS);
+
+                while (rollingChunks.length > maxChunks) {
+                    rollingChunks.shift();
+                }
+
+                console.log(
+                    "rolling chunks:",
+                    rollingChunks.length
+                );
+            };
 
                 recorder.start(RECORD_CHUNK_MS);
 
