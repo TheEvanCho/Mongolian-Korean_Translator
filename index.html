@@ -120,6 +120,56 @@
             transition: transform 0.35s ease, opacity 0.2s ease;
             transform-origin: center;
         }
+
+
+        #inputPanel {
+    position: absolute;
+    bottom: -220px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    transition: bottom .35s ease;
+}
+
+#inputPanel.show {
+    bottom: 80px;
+}
+
+#inputBox {
+    resize: none;
+
+    border: none;
+    border-radius: 18px;
+
+    padding: 16px;
+
+    font-size: 18px;
+
+    outline: none;
+
+    background: rgba(255,255,255,.92);
+
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+}
+
+#translateBtn {
+    border: none;
+    border-radius: 999px;
+
+    padding: 14px;
+
+    cursor: pointer;
+
+    background: #38BDF8;
+    color: white;
+
+    font-size: 18px;
+}
     </style>
 </head>
 
@@ -133,20 +183,10 @@
             <div id="line"></div>
 
             <div style="display:flex; gap:10px; align-items:center; z-index:2;">
-                <button id="micBtn" class="controlBtn mic">
+                <button id="keyboardBtn" class="controlBtn mic">
                     <svg class="micIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
-                
-                        <path d="M395-435q-35-35-35-85v-240q0-50
-                                                 35-85t85-35q50 0 85 35t35 85v240
-                                                 q0 50-35 85t-85 35q-50 0-85-35Zm85-205Zm-40
-                                                 520v-123q-104-14-172-93t-68-184h80q0
-                                                 83 58.5 141.5T480-320q83 0
-                                                 141.5-58.5T680-520h80q0
-                                                 105-68 184t-172 93v123h-80Zm68.5-371.5Q520-503
-                                                 520-520v-240q0-17-11.5-28.5T480-800q-17
-                                                 0-28.5 11.5T440-760v240q0 17
-                                                 11.5 28.5T480-480q17 0
-                                                 28.5-11.5Z" />
+                        <path
+                            d="M80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240Zm80 0h640v-480H160v480Zm80-80h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM240-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM240-560h480v-80H240v80Z" />
                     </svg>       </button>
 
                 <button id="swap" class="controlBtn">
@@ -154,6 +194,11 @@
                 </button>
             </div>
         </div>
+
+        <div id="inputPanel">
+            <textarea id="inputBox" placeholder="Type here..." rows="3"></textarea>
+        
+            <button id="translateBtn">Translate</button>  </div>
 
         <div id="transcript">...</div>
 
@@ -181,11 +226,15 @@
         
         //const audioContext = new AudioContext({ sampleRate: 16000 });
         const app = document.getElementById("app");
-        const micBtn = document.getElementById("micBtn");
+        const keyboardBtn = document.getElementById("keyboardBtn");
         const transcript = document.getElementById("transcript");
         const translated = document.getElementById("translated");
         const swap = document.getElementById("swap");
         const swapText = document.getElementById("swapText");
+
+        const inputPanel = document.getElementById("inputPanel");
+            const inputBox = document.getElementById("inputBox");
+            const translateBtn = document.getElementById("translateBtn");
 
         //let fullTranscriptWords = [];   //only show MAX_WORDS number of words in the transcript to make it look cleaner
         //const MAX_WORDS = 10;
@@ -235,48 +284,57 @@
         /* =========================
            CLICK CONTROL
         ========================= */
-        app.addEventListener("click", async () => {
+        keyboardBtn.addEventListener("click", (e) => {
 
-                if (!translator) {
-                    transcript.textContent = "Model still loading...";
-                    return;
-                }
+                e.stopPropagation();
 
-                transcript.textContent = "Translating...";
+                inputPanel.classList.add("show");
 
-                const result = await translator(
-                    "안녕하세요",
-                    {
-                        src_lang: "kor_Hang",
-                        tgt_lang: "khk_Cyrl" 
-                    }
-                );
-
-                console.log(result);
-
-                translated.textContent = result[0].translation_text;
-                transcript.textContent = "Done! ✨";
+                inputBox.focus();
             });
-            /*
-            if (e.target.id === "swap" || e.target.id === "swapText") return;
+ 
+            translateBtn.addEventListener("click", async () => {
 
-            isRecording = !isRecording;
+                    if (!translator) return;
 
-            if (isRecording) {
-                stopRequested = false;
-                micBtn.classList.add("active");
-                transcript.textContent = "듣는 중... 🎤";
-                fullTranscriptWords = [];   // ← add this to clear previous transcript when starting a new recording session
+                    const text = inputBox.value.trim();
 
-                rollingChunks.length = 0;
-                await startMicLoop();
-            } else {
-                stopRequested = true;
-                micBtn.classList.remove("active");
-                stopMicLoop();
-            }
-        });
- */
+                    if (!text) return;
+
+                    transcript.textContent = "Translating...";
+
+                    const result = await translator(text, {
+                        src_lang: mode === "한국어 → Монгол"
+                            ? "kor_Hang"
+                            : "khk_Cyrl",
+
+                        tgt_lang: mode === "한국어 → Монгол"
+                            ? "khk_Cyrl"
+                            : "kor_Hang"
+                    });
+
+                    translated.textContent = result[0].translation_text;
+
+                    transcript.textContent = "Done! ✨";
+                });
+
+                inputBox.addEventListener("keydown", async (e) => {
+
+                        if (e.key !== "Enter" || e.shiftKey) return;
+
+                        e.preventDefault();
+
+                        translateBtn.click();
+                    });
+                    
+                document.addEventListener("click", (e) => {
+
+                        if (!inputPanel.contains(e.target) &&
+                            !keyboardBtn.contains(e.target)) {
+
+                            inputPanel.classList.remove("show");
+                        }
+                    });
         /* =========================
            MODE SWAP (UNCHANGED UI)
         ========================= */
