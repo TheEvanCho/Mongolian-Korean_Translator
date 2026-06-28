@@ -170,6 +170,28 @@
 
     font-size: 18px;
 }
+
+@keyframes loadingPulse {
+
+0% {
+    background: #FACC15;
+    box-shadow: 0 0 6px #FACC15;
+}
+
+50% {
+    background: #FDE68A;
+    box-shadow: 0 0 18px #FACC15;
+}
+
+100% {
+    background: #FACC15;
+    box-shadow: 0 0 6px #FACC15;
+}
+}
+
+#line.loading {
+animation: loadingPulse 1s infinite;
+}
     </style>
 </head>
 
@@ -231,10 +253,12 @@
         const translated = document.getElementById("translated");
         const swap = document.getElementById("swap");
         const swapText = document.getElementById("swapText");
-
+        const line = document.getElementById("line");
+        
         const inputPanel = document.getElementById("inputPanel");
-            const inputBox = document.getElementById("inputBox");
-            const translateBtn = document.getElementById("translateBtn");
+        const inputBox = document.getElementById("inputBox");
+        const translateBtn = document.getElementById("translateBtn");
+
 
         //let fullTranscriptWords = [];   //only show MAX_WORDS number of words in the transcript to make it look cleaner
         //const MAX_WORDS = 10;
@@ -298,11 +322,20 @@
                     if (!translator) return;
 
                     const text = inputBox.value.trim();
+                    inputPanel.classList.remove("show");
+                    inputBox.value = "";
 
                     if (!text) return;
 
-                    transcript.textContent = "Translating...";
+                    line.classList.add("loading");
 
+                translated.textContent = "";
+
+                transcript.textContent = text;
+
+                translateBtn.disabled = true;
+                keyboardBtn.disabled = true;
+                try {
                     const result = await translator(text, {
                         src_lang: mode === "한국어 → Монгол"
                             ? "kor_Hang"
@@ -314,8 +347,30 @@
                     });
 
                     translated.textContent = result[0].translation_text;
+                    transcript.textContent = "";
+                    line.style.background = "rgba(56,189,248,.45)";
+                    line.style.boxShadow = "0 0 12px rgba(56,189,248,.25)";
 
-                    transcript.textContent = "Done! ✨";
+                }
+                catch (err) {
+
+                    console.error(err);
+
+                    transcript.textContent = "Translation failed.";
+
+                    line.style.background = "#EF4444";
+                    line.style.boxShadow = "0 0 12px #EF4444";
+
+                }
+                finally {
+
+                    line.classList.remove("loading");
+                    translateBtn.disabled = false;
+                    keyboardBtn.disabled = false;
+
+                }
+
+
                 });
 
                 inputBox.addEventListener("keydown", async (e) => {
@@ -326,7 +381,7 @@
 
                         translateBtn.click();
                     });
-                    
+
                 document.addEventListener("click", (e) => {
 
                         if (!inputPanel.contains(e.target) &&
