@@ -336,6 +336,10 @@ animation: loadingPulse 1s infinite;
                 translateBtn.disabled = true;
                 keyboardBtn.disabled = true;
                 try {
+                    line.classList.add("loading");
+
+                    await new Promise(resolve => setTimeout(resolve, 30));
+
                     const result = await translator(text, {
                         src_lang: mode === "한국어 → Монгол"
                             ? "kor_Hang"
