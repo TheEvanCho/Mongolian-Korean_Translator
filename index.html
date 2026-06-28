@@ -121,7 +121,9 @@
             transform-origin: center;
         }
 
-
+        #transcript{
+    transition: opacity .25s ease;
+}
         #inputPanel {
     position: absolute;
     bottom: -220px;
@@ -340,6 +342,15 @@ animation: loadingPulse 1s infinite;
 
                     await new Promise(resolve => setTimeout(resolve, 30));
 
+                    // close keyboard FIRST
+                    inputPanel.classList.remove("show");
+                    inputBox.blur();
+
+                    // allow the CSS animation to start
+                    await new Promise(requestAnimationFrame);
+                    await new Promise(resolve => setTimeout(resolve, 350));
+
+                    // now start translating
                     const result = await translator(text, {
                         src_lang: mode === "한국어 → Монгол"
                             ? "kor_Hang"
@@ -351,10 +362,6 @@ animation: loadingPulse 1s infinite;
                     });
 
                     translated.textContent = result[0].translation_text;
-
-                    await new Promise(r => setTimeout(r, 150));
-
-                    inputPanel.classList.remove("show");
 
                     inputBox.value = "";
 
