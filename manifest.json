@@ -1,6 +1,6 @@
 {
-    "name": "Mongolian Korean Translator",
-    "short_name": "Translator",
+    "name": "Mo-Ko",
+    "short_name": "MOKO",
     "description": "Offline Korean ↔ Mongolian translator",
     "start_url": "/",
     "scope": "/",
