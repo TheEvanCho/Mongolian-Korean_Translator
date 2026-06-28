@@ -161,26 +161,25 @@
 
     <script type=module>
         import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
-        let whisper;
-
+        let translator;
 
         /* =========================
            STATE
         ========================= */
-        let isRecording = false;
-        let stopRequested = false;
+        //let isRecording = false;
+        //let stopRequested = false;
 
-        let mediaStream;
-        let recorder;
-        let chunks = [];
+        //let mediaStream;
+        //let recorder;
+        //let chunks = [];
 
-        const RECORD_CHUNK_MS = 250;
-        const BUFFER_SECONDS = 8;
-        const TRANSCRIBE_EVERY_MS = 1000;
+        //const RECORD_CHUNK_MS = 250;
+        //const BUFFER_SECONDS = 8;
+        //const TRANSCRIBE_EVERY_MS = 1000;
 
-        const rollingChunks = [];
+        //const rollingChunks = [];
         
-        const audioContext = new AudioContext({ sampleRate: 16000 });
+        //const audioContext = new AudioContext({ sampleRate: 16000 });
         const app = document.getElementById("app");
         const micBtn = document.getElementById("micBtn");
         const transcript = document.getElementById("transcript");
@@ -188,47 +187,64 @@
         const swap = document.getElementById("swap");
         const swapText = document.getElementById("swapText");
 
-        let fullTranscriptWords = [];   //only show MAX_WORDS number of words in the transcript to make it look cleaner
-        const MAX_WORDS = 10;
+        //let fullTranscriptWords = [];   //only show MAX_WORDS number of words in the transcript to make it look cleaner
+        //const MAX_WORDS = 10;
 
         let mode = "한국어 → Монгол";
 
-        async function loadWhisper() {
+        async function loadTranslator() {
 
-            transcript.textContent = "Loading Whisper Base...";
+                transcript.textContent = "Loading translator...";
 
-            whisper = await pipeline(
-                "automatic-speech-recognition",
-                "Xenova/whisper-base"
-            );
+                translator = await pipeline(
+                    "translation",
+                    "Xenova/nllb-200-distilled-600M"
+                );
 
-            transcript.textContent = "Ready ✨";
-        }
+                transcript.textContent = "Ready ✨";
+            }
 
-        async function init() {
-            await loadWhisper();
-        }
+            async function init() {
+                await loadTranslator();
+            }
 
         init();
 
         // for testing: array of words
-        const fakeWords = [
-                "hello", "testing", "audio", "microphone", "translation",
-                "banana", "airplane", "sky", "cloud", "signal",
-                "neural", "speech", "whisper", "chunk", "stream",
-                "korean", "mongolian", "latency", "pipeline", "flutter",
-                "I am", "lorem ipsum", "openai", "mongolian", "korean", "translate"
-            ];
+        //const fakeWords = [
+        //    "hello", "testing", "audio", "microphone", "translation",
+        //    "banana", "airplane", "sky", "cloud", "signal",
+        //    "neural", "speech", "whisper", "chunk", "stream",
+        //    "korean", "mongolian", "latency", "pipeline", "flutter",
+        //    "I am", "lorem ipsum", "openai", "mongolian", "korean", "translate"
+            //];
 
         /* =========================
            CLICK CONTROL
         ========================= */
-        app.addEventListener("click", async (e) => {
-            if (!whisper) {
-                transcript.textContent = "Model still loading... 🐢";
-                return;
-            }
-            
+        app.addEventListener("click", async () => {
+
+                if (!translator) {
+                    transcript.textContent = "Model still loading...";
+                    return;
+                }
+
+                transcript.textContent = "Translating...";
+
+                const result = await translator(
+                    "안녕하세요",
+                    {
+                        src_lang: "kor_Hang",
+                        tgt_lang: "khk_Cyrl"
+                    }
+                );
+
+                console.log(result);
+
+                translated.textContent = result[0].translation_text;
+                transcript.textContent = "Done! ✨";
+            });
+            /*
             if (e.target.id === "swap" || e.target.id === "swapText") return;
 
             isRecording = !isRecording;
@@ -247,7 +263,7 @@
                 stopMicLoop();
             }
         });
-
+ */
         /* =========================
            MODE SWAP (UNCHANGED UI)
         ========================= */
@@ -269,9 +285,10 @@
             }, 180);
         });
 
-        let whisperTimer;
-        let whisperBusy = false;
+        //let whisperTimer;
+        //let whisperBusy = false;
 
+        /*
         function startWhisperLoop() {
 
             whisperTimer = setInterval(async () => {
@@ -300,11 +317,11 @@
             }, TRANSCRIBE_EVERY_MS);
             }
 
-        
+            */
         /* =========================
            MIC ENGINE
         ========================= */
-        async function startMicLoop() {
+        /*async function startMicLoop() {
                 mediaStream = await navigator.mediaDevices.getUserMedia({
                     audio: true
                 });
@@ -341,7 +358,7 @@
                 startWhisperLoop();
             }
 
-        
+        */
 
         /* function playAndRepeat(blob) {  //blobbbbbb
                 const url = URL.createObjectURL(blob);
@@ -360,6 +377,7 @@
                 });
             } */
 
+            /*
             function stopMicLoop() {
 
                 isRecording = false;
@@ -374,6 +392,9 @@
                 rollingChunks.length = 0;
             }
 
+            */
+
+            /*
         async function runWhisper(blob) {
 
             const arrayBuffer = await blob.arrayBuffer();
@@ -426,6 +447,7 @@
 
             return result.text;
         }
+            */
     </script>
 
 </body>
