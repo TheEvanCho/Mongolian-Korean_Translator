@@ -314,7 +314,9 @@ animation: loadingPulse 1s infinite;
 
                 inputPanel.classList.add("show");
 
-                inputBox.focus();
+            transcript.style.visibility = "hidden";
+
+            inputBox.focus();
             });
  
             translateBtn.addEventListener("click", async () => {
@@ -322,10 +324,8 @@ animation: loadingPulse 1s infinite;
                     if (!translator) return;
 
                     const text = inputBox.value.trim();
-                    inputPanel.classList.remove("show");
-                    inputBox.value = "";
 
-                    if (!text) return;
+                if (!text) return;
 
                     line.classList.add("loading");
 
@@ -351,7 +351,16 @@ animation: loadingPulse 1s infinite;
                     });
 
                     translated.textContent = result[0].translation_text;
+
+                    await new Promise(r => setTimeout(r, 150));
+
+                    inputPanel.classList.remove("show");
+
+                    inputBox.value = "";
+
+                    transcript.style.visibility = "visible";
                     transcript.textContent = "";
+
                     line.style.background = "rgba(56,189,248,.45)";
                     line.style.boxShadow = "0 0 12px rgba(56,189,248,.25)";
 
@@ -361,7 +370,9 @@ animation: loadingPulse 1s infinite;
                     console.error(err);
 
                     transcript.textContent = "Translation failed.";
-
+                    inputPanel.classList.remove("show");
+                    inputBox.value = "";
+                    transcript.style.visibility = "visible";
                     line.style.background = "#EF4444";
                     line.style.boxShadow = "0 0 12px #EF4444";
 
@@ -391,7 +402,8 @@ animation: loadingPulse 1s infinite;
                         if (!inputPanel.contains(e.target) &&
                             !keyboardBtn.contains(e.target)) {
 
-                            inputPanel.classList.remove("show");
+                                inputPanel.classList.remove("show");
+                            transcript.style.visibility = "visible";
                         }
                     });
         /* =========================
