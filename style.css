@@ -45,6 +45,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: top .35s ease;
+}
+
+#horizon.raise {
+    top: 62%;
 }
 
 #line {

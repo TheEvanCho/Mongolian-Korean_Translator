@@ -2,23 +2,6 @@
     import {pipeline} from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
     let translator;
 
-        /* =========================
-           STATE
-        ========================= */
-        //let isRecording = false;
-        //let stopRequested = false;
-
-        //let mediaStream;
-        //let recorder;
-        //let chunks = [];
-
-        //const RECORD_CHUNK_MS = 250;
-        //const BUFFER_SECONDS = 8;
-        //const TRANSCRIBE_EVERY_MS = 1000;
-
-        //const rollingChunks = [];
-
-        //const audioContext = new AudioContext({sampleRate: 16000 });
     const app = document.getElementById("app");
     const keyboardBtn = document.getElementById("keyboardBtn");
     const transcript = document.getElementById("transcript");
@@ -31,9 +14,6 @@
     const inputBox = document.getElementById("inputBox");
     const translateBtn = document.getElementById("translateBtn");
 
-
-    //let fullTranscriptWords = [];   //only show MAX_WORDS number of words in the transcript to make it look cleaner
-    //const MAX_WORDS = 10;
 
     let mode = "한국어 → Монгол";
 
@@ -67,16 +47,6 @@
             }
 
     init();
-
-        // for testing: array of words
-        //const fakeWords = [
-        //    "hello", "testing", "audio", "microphone", "translation",
-        //    "banana", "airplane", "sky", "cloud", "signal",
-        //    "neural", "speech", "whisper", "chunk", "stream",
-        //    "korean", "mongolian", "latency", "pipeline", "flutter",
-        //    "I am", "lorem ipsum", "openai", "mongolian", "korean", "translate"
-            //];
-
         /* =========================
            CLICK CONTROL
         ========================= */
@@ -203,170 +173,6 @@
     swapText.style.opacity = "1";
             }, 180);
         });
-
-        //let whisperTimer;
-        //let whisperBusy = false;
-
-        /*
-        function startWhisperLoop() {
-
-        whisperTimer = setInterval(async () => {
-            if (whisperBusy) return;
-            if (rollingChunks.length === 0) return;
-
-            whisperBusy = true;
-
-            try {
-
-                const blob = new Blob(
-                    [...rollingChunks],
-                    { type: "audio/webm" }
-                );
-
-                const text = await runWhisper(blob);
-
-                console.log("rolling whisper:", text);
-
-                transcript.textContent = text;
-
-            } finally {
-                whisperBusy = false;
-            }
-
-        }, TRANSCRIBE_EVERY_MS);
-            }
-
-    */
-        /* =========================
-           MIC ENGINE
-        ========================= */
-        /*async function startMicLoop() {
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
-
-    recorder = new MediaRecorder(mediaStream);
-
-                recorder.ondataavailable = (e) => {
-
-                if (!e.data.size) return;
-
-    console.log(
-    "chunk",
-    e.data.size,
-    "bytes"
-    );
-
-    rollingChunks.push(e.data);
-
-    const maxChunks =
-    BUFFER_SECONDS * (1000 / RECORD_CHUNK_MS);
-
-                while (rollingChunks.length > maxChunks) {
-        rollingChunks.shift();
-                }
-
-    console.log(
-    "rolling chunks:",
-    rollingChunks.length
-    );
-            };
-
-    recorder.start(RECORD_CHUNK_MS);
-
-    startWhisperLoop();
-            }
-
-    */
-
-        /* function playAndRepeat(blob) {  //blobbbbbb
-                const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-
-                audio.onended = () => {
-        URL.revokeObjectURL(url);
-
-    if (isRecording) {
-        runCycle();
-                    }
-                };
-
-                audio.play().catch(err => {
-        console.log("Playback interrupted:", err);
-                });
-            } */
-
-            /*
-            function stopMicLoop() {
-
-        isRecording = false;
-
-    clearInterval(whisperTimer);
-
-    recorder?.stop();
-
-    mediaStream?.getTracks()
-                    .forEach(t => t.stop());
-
-    rollingChunks.length = 0;
-            }
-
-    */
-
-            /*
-        async function runWhisper(blob) {
-
-            const arrayBuffer = await blob.arrayBuffer();
-
-    let audioBuffer;
-    try {
-        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-            } catch (e) {
-        console.log("decode failed", e);
-    return "";
-            }
-
-    const samples = audioBuffer.getChannelData(0);
-
-    let energy = 0;
-
-    for (let i = 0; i < samples.length; i++) {
-        energy += Math.abs(samples[i]);
-            }
-
-    energy /= samples.length;
-
-    console.log(
-    "seconds:",
-    (samples.length / 16000).toFixed(1),
-    "energy:",
-    energy
-    );
-
-    if (energy < 0.003) {
-        console.log("silence skipped");
-    return "";
-            }
-
-    if (!samples || samples.length === 0) {
-                return "";
-            }
-
-    const language =
-    mode === "한국어 → Монгол"
-    ? "ko"
-    : "mn";
-
-    const result = await whisper(samples, {
-        language,
-        task: "transcribe"
-            });
-
-    console.log(result);
-
-    return result.text;
-        }
-    */
 
 if ("serviceWorker" in navigator) {
 
