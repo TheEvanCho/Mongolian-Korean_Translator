@@ -89,7 +89,7 @@ translateBtn.addEventListener("click", async () => {
 
     // now start translating
     const result = await translator(text, {
-      src_lang: mode === "한국어 → Монгол" ? "kor_Hang" : "khk_Cyrl",
+      //src_lang: mode === "한국어 → Монгол" ? "kor_Hang" : "khk_Cyrl",
 
       tgt_lang: mode === "한국어 → Монгол" ? "khk_Cyrl" : "kor_Hang",
     });
