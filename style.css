@@ -55,7 +55,7 @@ body {
 }
 
 #horizon.raise {
-  top: 64%;
+  top: 60%;
 }
 
 #line {
@@ -151,7 +151,7 @@ body {
 }
 
 #inputPanel.show {
-  bottom: 50px;
+  bottom: 35px;
 }
 
 #inputBox {
