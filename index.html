@@ -1,51 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>번역 허브</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#38BDF8">
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#38BDF8" />
+  </head>
 
-</head>
-
-<body>
-
+  <body>
     <div id="app">
+      <div id="translated">번역 결과가 여기에 표시됩니다.</div>
 
-        <div id="translated">번역 결과가 여기에 표시됩니다.</div>
+      <div id="horizon">
+        <div id="line"></div>
 
-        <div id="horizon">
-            <div id="line"></div>
+        <div style="display: flex; gap: 10px; align-items: center; z-index: 2">
+          <button id="keyboardBtn" class="controlBtn mic">
+            <svg
+              class="micIcon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 -960 960 960"
+              fill="currentColor"
+            >
+              <path
+                d="M80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240Zm80 0h640v-480H160v480Zm80-80h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM240-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM240-560h480v-80H240v80Z"
+              />
+            </svg>
+          </button>
 
-            <div style="display:flex; gap:10px; align-items:center; z-index:2;">
-                <button id="keyboardBtn" class="controlBtn mic">
-                    <svg class="micIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
-                        <path
-                            d="M80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240Zm80 0h640v-480H160v480Zm80-80h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM240-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM240-560h480v-80H240v80Z" />
-                    </svg>       </button>
-
-                <button id="swap" class="controlBtn">
-                    <span id="swapText">한국어 → Монгол</span>
-                </button>
-            </div>
+          <button id="swap" class="controlBtn">
+            <span id="swapText">한국어 → Монгол</span>
+          </button>
+          <button id="deepBtn" class="controlBtn">🧠</button>
         </div>
+      </div>
 
-        <div id="inputPanel">
-            <textarea id="inputBox" placeholder="Type here..." rows="3"></textarea>
-        
-            <button id="translateBtn">Translate</button>  </div>
+      <div id="inputPanel">
+        <textarea id="inputBox" placeholder="Type here..." rows="3"></textarea>
 
-        <div id="transcript">...</div>
+        <button id="translateBtn">Translate</button>
+      </div>
 
+      <div id="transcript">...</div>
     </div>
 
     <script type="module" src="app.js"></script>
-
-</body>
-
+  </body>
 </html>

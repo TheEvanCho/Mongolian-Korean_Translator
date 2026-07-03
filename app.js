@@ -1,5 +1,7 @@
 import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers";
+
 let translator;
+let deepThinking = false;
 
 const app = document.getElementById("app");
 const keyboardBtn = document.getElementById("keyboardBtn");
@@ -9,12 +11,23 @@ const swap = document.getElementById("swap");
 const swapText = document.getElementById("swapText");
 const line = document.getElementById("line");
 const horizon = document.getElementById("horizon");
+
 const inputPanel = document.getElementById("inputPanel");
 const inputBox = document.getElementById("inputBox");
 const translateBtn = document.getElementById("translateBtn");
 
+const deepBtn = document.getElementById("deepBtn");
+
 let mode = "한국어 → Монгол";
 
+const targetMap = {
+  "한국어 → Монгол": "khk_Cyrl",
+  "Монгол → 한국어": "kor_Hang",
+};
+
+/* =========================
+   LOAD MODEL
+========================= */
 async function loadTranslator() {
   try {
     transcript.textContent = "Loading translator...";
@@ -26,23 +39,18 @@ async function loadTranslator() {
     );
 
     console.log("Loaded!", translator);
-
     transcript.textContent = "Ready ✨";
   } catch (err) {
     console.error(err);
-
     transcript.textContent = "FAILED";
   }
 }
 
-async function init() {
-  await loadTranslator();
-}
+loadTranslator();
 
-init();
 /* =========================
-           CLICK CONTROL
-        ========================= */
+   UI OPEN
+========================= */
 keyboardBtn.addEventListener("click", (e) => {
   e.stopPropagation();
 
@@ -50,10 +58,22 @@ keyboardBtn.addEventListener("click", (e) => {
   horizon.classList.add("raise");
 
   transcript.style.visibility = "hidden";
-
   inputBox.focus();
 });
 
+/* =========================
+   DEEP THINKING TOGGLE
+========================= */
+deepBtn.addEventListener("click", () => {
+  deepThinking = !deepThinking;
+
+  deepBtn.classList.toggle("active", deepThinking);
+  deepBtn.textContent = deepThinking ? "🧠 Deep ON" : "🧠 Deep OFF";
+});
+
+/* =========================
+   TRANSLATE CORE
+========================= */
 translateBtn.addEventListener("click", async () => {
   if (!translator) {
     transcript.textContent = "Translator model not available.";
@@ -61,43 +81,58 @@ translateBtn.addEventListener("click", async () => {
   }
 
   const text = inputBox.value.trim();
-
   if (!text) return;
 
+  const tgt_lang = targetMap[mode];
+
   line.classList.add("loading");
-
   translated.textContent = "";
-
   transcript.textContent = text;
 
   translateBtn.disabled = true;
   keyboardBtn.disabled = true;
+
   try {
-    line.classList.add("loading");
+    await new Promise((r) => setTimeout(r, 30));
 
-    await new Promise((resolve) => setTimeout(resolve, 30));
-
-    // close keyboard FIRST
     inputPanel.classList.remove("show");
     horizon.classList.remove("raise");
-
     inputBox.blur();
 
-    // allow the CSS animation to start
     await new Promise(requestAnimationFrame);
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    await new Promise((r) => setTimeout(r, 300));
 
-    // now start translating
-    const result = await translator(text, {
-      //src_lang: mode === "한국어 → Монгол" ? "kor_Hang" : "khk_Cyrl",
+    let finalText = text;
 
-      tgt_lang: mode === "한국어 → Монгол" ? "khk_Cyrl" : "kor_Hang",
-    });
+    /* =========================
+       🧠 DEEP THINKING MODE
+    ========================= */
+    if (deepThinking) {
+      // Step 1: input → English
+      const toEnglish = await translator(text, {
+        tgt_lang: "eng_Latn",
+      });
 
-    translated.textContent = result[0].translation_text;
+      const english = toEnglish[0].translation_text;
+
+      // Step 2: English → target
+      const finalResult = await translator(english, {
+        tgt_lang,
+      });
+
+      finalText = finalResult[0].translation_text;
+    } else {
+      // Direct translation
+      const result = await translator(text, {
+        tgt_lang,
+      });
+
+      finalText = result[0].translation_text;
+    }
+
+    translated.textContent = finalText;
 
     inputBox.value = "";
-
     transcript.style.visibility = "visible";
     transcript.textContent = "";
 
@@ -105,11 +140,14 @@ translateBtn.addEventListener("click", async () => {
     line.style.boxShadow = "0 0 12px rgba(56,189,248,.25)";
   } catch (err) {
     console.error(err);
+
     transcript.textContent = "Translation failed.";
     inputPanel.classList.remove("show");
     horizon.classList.remove("raise");
+
     inputBox.value = "";
     transcript.style.visibility = "visible";
+
     line.style.background = "#EF4444";
     line.style.boxShadow = "0 0 12px #EF4444";
   } finally {
@@ -119,25 +157,30 @@ translateBtn.addEventListener("click", async () => {
   }
 });
 
+/* =========================
+   ENTER KEY
+========================= */
 inputBox.addEventListener("keydown", async (e) => {
   if (e.key !== "Enter" || e.shiftKey) return;
 
   e.preventDefault();
-
   translateBtn.click();
 });
 
+/* =========================
+   CLOSE PANEL ON CLICK OUTSIDE
+========================= */
 document.addEventListener("click", (e) => {
   if (!inputPanel.contains(e.target) && !keyboardBtn.contains(e.target)) {
     inputPanel.classList.remove("show");
     horizon.classList.remove("raise");
-
     transcript.style.visibility = "visible";
   }
 });
+
 /* =========================
-           MODE SWAP (UNCHANGED UI)
-        ========================= */
+   MODE SWAP
+========================= */
 swap.addEventListener("click", (e) => {
   e.stopPropagation();
 
@@ -154,6 +197,9 @@ swap.addEventListener("click", (e) => {
   }, 180);
 });
 
+/* =========================
+   SERVICE WORKER
+========================= */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("service-worker.js")

@@ -204,3 +204,20 @@ body {
 #line.loading {
   animation: loadingPulse 1s infinite;
 }
+
+#deepBtn {
+  padding: 16px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+#deepBtn.active {
+  background: #38bdf8;
+  color: white;
+  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
+}
