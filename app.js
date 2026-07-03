@@ -3,7 +3,6 @@ import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers";
 let translator;
 let deepThinking = false;
 
-const app = document.getElementById("app");
 const keyboardBtn = document.getElementById("keyboardBtn");
 const transcript = document.getElementById("transcript");
 const translated = document.getElementById("translated");
@@ -15,7 +14,6 @@ const horizon = document.getElementById("horizon");
 const inputPanel = document.getElementById("inputPanel");
 const inputBox = document.getElementById("inputBox");
 const translateBtn = document.getElementById("translateBtn");
-
 const deepBtn = document.getElementById("deepBtn");
 
 let mode = "AUTO → Монгол";
@@ -26,103 +24,127 @@ const targetMap = {
 };
 
 /* =========================
+   TRANSCRIPT ENGINE
+   (NO ANIMATION BLOCKING)
+========================= */
+
+function setTranscript(state, text = "") {
+  switch (state) {
+    case "idle":
+      transcript.textContent = "";
+      break;
+
+    case "typing":
+      transcript.textContent = text;
+      break;
+
+    case "waiting":
+      transcript.textContent = `${text}\nwait...`;
+      break;
+
+    case "done":
+      transcript.textContent = text;
+      break;
+
+    case "error":
+      transcript.textContent = "translation failed.";
+      break;
+  }
+}
+
+/* =========================
    LOAD MODEL
 ========================= */
+
 async function loadTranslator() {
   try {
-    transcript.textContent = "Loading translator...";
-    console.log("Loading model...");
+    setTranscript("typing", "loading translator...");
 
     translator = await pipeline(
       "translation",
       "Xenova/nllb-200-distilled-600M",
     );
 
-    console.log("Loaded!", translator);
-    transcript.textContent = "Ready ✨";
+    setTranscript("typing", "ready ✨");
   } catch (err) {
     console.error(err);
-    transcript.textContent = "FAILED";
+    setTranscript("error");
   }
 }
 
 loadTranslator();
 
 /* =========================
-   UI OPEN
+   OPEN INPUT
 ========================= */
+
 keyboardBtn.addEventListener("click", (e) => {
   e.stopPropagation();
 
   inputPanel.classList.add("show");
   horizon.classList.add("raise");
 
-  transcript.style.visibility = "hidden";
+  setTranscript("idle"); // clean reset
+
   inputBox.focus();
 });
 
 /* =========================
-   DEEP THINKING TOGGLE
+   DEEP THINK TOGGLE
 ========================= */
+
 deepBtn.addEventListener("click", () => {
   deepThinking = !deepThinking;
-
   deepBtn.classList.toggle("active", deepThinking);
-  deepBtn.textContent = deepThinking ? "🧠" : "🧠";
 });
 
 /* =========================
    TRANSLATE CORE
+   (IMPORTANT: NO ANIMATION STALL)
 ========================= */
+
 translateBtn.addEventListener("click", async () => {
-  if (!translator) {
-    transcript.textContent = "Translator model not available.";
-    return;
-  }
+  if (!translator) return;
 
   const text = inputBox.value.trim();
   if (!text) return;
 
   const tgt_lang = targetMap[mode];
 
-  line.classList.add("loading");
-  translated.textContent = "";
-  transcript.textContent = text;
+  // UI update ONLY (no blocking animation logic here)
+  setTranscript("waiting", text);
 
+  translated.textContent = "";
   translateBtn.disabled = true;
   keyboardBtn.disabled = true;
 
   try {
-    await new Promise((r) => setTimeout(r, 30));
-
+    // close UI quickly (no animation dependency)
     inputPanel.classList.remove("show");
     horizon.classList.remove("raise");
     inputBox.blur();
 
+    // let UI paint BEFORE model runs
     await new Promise(requestAnimationFrame);
-    await new Promise((r) => setTimeout(r, 300));
 
     let finalText = text;
 
     /* =========================
-       🧠 DEEP THINKING MODE
+       🧠 DEEP THINK MODE
     ========================= */
     if (deepThinking) {
-      // Step 1: input → English
       const toEnglish = await translator(text, {
         tgt_lang: "eng_Latn",
       });
 
       const english = toEnglish[0].translation_text;
 
-      // Step 2: English → target
       const finalResult = await translator(english, {
         tgt_lang,
       });
 
       finalText = finalResult[0].translation_text;
     } else {
-      // Direct translation
       const result = await translator(text, {
         tgt_lang,
       });
@@ -133,25 +155,11 @@ translateBtn.addEventListener("click", async () => {
     translated.textContent = finalText;
 
     inputBox.value = "";
-    transcript.style.visibility = "visible";
-    transcript.textContent = "";
-
-    line.style.background = "rgba(56,189,248,.45)";
-    line.style.boxShadow = "0 0 12px rgba(56,189,248,.25)";
+    setTranscript("done", finalText);
   } catch (err) {
     console.error(err);
-
-    transcript.textContent = "Translation failed.";
-    inputPanel.classList.remove("show");
-    horizon.classList.remove("raise");
-
-    inputBox.value = "";
-    transcript.style.visibility = "visible";
-
-    line.style.background = "#EF4444";
-    line.style.boxShadow = "0 0 12px #EF4444";
+    setTranscript("error");
   } finally {
-    line.classList.remove("loading");
     translateBtn.disabled = false;
     keyboardBtn.disabled = false;
   }
@@ -160,7 +168,8 @@ translateBtn.addEventListener("click", async () => {
 /* =========================
    ENTER KEY
 ========================= */
-inputBox.addEventListener("keydown", async (e) => {
+
+inputBox.addEventListener("keydown", (e) => {
   if (e.key !== "Enter" || e.shiftKey) return;
 
   e.preventDefault();
@@ -168,19 +177,22 @@ inputBox.addEventListener("keydown", async (e) => {
 });
 
 /* =========================
-   CLOSE PANEL ON CLICK OUTSIDE
+   CLOSE ON OUTSIDE CLICK
 ========================= */
+
 document.addEventListener("click", (e) => {
   if (!inputPanel.contains(e.target) && !keyboardBtn.contains(e.target)) {
     inputPanel.classList.remove("show");
     horizon.classList.remove("raise");
-    transcript.style.visibility = "visible";
+
+    setTranscript("idle");
   }
 });
 
 /* =========================
    MODE SWAP
 ========================= */
+
 swap.addEventListener("click", (e) => {
   e.stopPropagation();
 
@@ -200,6 +212,7 @@ swap.addEventListener("click", (e) => {
 /* =========================
    SERVICE WORKER
 ========================= */
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("service-worker.js")
