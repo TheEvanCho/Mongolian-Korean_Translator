@@ -217,7 +217,13 @@ body {
 }
 
 #deepBtn.active {
-  background: #38bdf8;
+  background: rgba(255, 255, 255, 0.82);
   color: white;
   box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
+}
+
+.deepIcon {
+  width: 26px;
+  height: 26px;
+  pointer-events: none;
 }
