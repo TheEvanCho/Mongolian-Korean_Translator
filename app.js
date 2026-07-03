@@ -18,11 +18,11 @@ const translateBtn = document.getElementById("translateBtn");
 
 const deepBtn = document.getElementById("deepBtn");
 
-let mode = "한국어 → Монгол";
+let mode = "AUTO → Монгол";
 
 const targetMap = {
-  "한국어 → Монгол": "khk_Cyrl",
-  "Монгол → 한국어": "kor_Hang",
+  "AUTO → Монгол": "khk_Cyrl",
+  "AUTO → 한국어": "kor_Hang",
 };
 
 /* =========================
@@ -68,7 +68,7 @@ deepBtn.addEventListener("click", () => {
   deepThinking = !deepThinking;
 
   deepBtn.classList.toggle("active", deepThinking);
-  deepBtn.textContent = deepThinking ? "🧠 Deep ON" : "🧠 Deep OFF";
+  deepBtn.textContent = deepThinking ? "🧠" : "🧠";
 });
 
 /* =========================
@@ -188,7 +188,7 @@ swap.addEventListener("click", (e) => {
   swapText.style.opacity = "0";
 
   setTimeout(() => {
-    mode = mode === "한국어 → Монгол" ? "Монгол → 한국어" : "한국어 → Монгол";
+    mode = mode === "AUTO → Монгол" ? "AUTO → 한국어" : "AUTO → Монгол";
 
     swapText.textContent = mode;
 
