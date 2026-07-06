@@ -17,7 +17,8 @@ const inputBox = document.getElementById("inputBox");
 const translateBtn = document.getElementById("translateBtn");
 
 const deepBtn = document.getElementById("deepBtn");
-
+const flipBtn = document.getElementById("flipBtn");
+let flipped = false;
 let mode = "AUTO → Монгол";
 
 const targetMap = {
@@ -159,6 +160,11 @@ deepBtn.addEventListener("click", () => {
   deepThinking = !deepThinking;
 
   deepBtn.innerHTML = deepThinking ? BRAIN_ICON : SPEED_ICON;
+});
+
+flipBtn.addEventListener("click", () => {
+  flipped = !flipped;
+  translated.classList.toggle("flipped", flipped);
 });
 
 /* =========================

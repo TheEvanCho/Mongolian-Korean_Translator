@@ -38,6 +38,10 @@ body {
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+#translated.flipped {
+  transform: translateX(-50%) rotate(180deg);
+}
+
 #horizon {
   position: absolute;
   top: 70%;
