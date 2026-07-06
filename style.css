@@ -115,6 +115,11 @@ body {
   box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
 }
 
+.controlBtn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 #swapText {
   display: inline-block;
   transform-origin: center;

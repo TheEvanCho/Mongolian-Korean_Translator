@@ -117,8 +117,22 @@ c-0.002,11.045,8.951,20,19.998,20.002l0,0C164.998,216.89,164.998,216.89,165,216.
 /* =========================
    LOAD MODEL
 ========================= */
+let translatorState = "loading"; // "loading" | "ready" | "failed"
+
+function flashLine(color) {
+  line.style.background = color;
+  line.style.boxShadow = `0 0 12px ${color}`;
+
+  setTimeout(() => {
+    line.style.background = "";
+    line.style.boxShadow = "";
+  }, 400);
+}
+
 async function loadTranslator() {
   try {
+    translatorState = "loading";
+    keyboardBtn.classList.add("disabled");
     transcript.textContent = "Loading translator...";
     console.log("Loading model...");
 
@@ -128,9 +142,13 @@ async function loadTranslator() {
     );
 
     console.log("Loaded!", translator);
+    translatorState = "ready";
+    keyboardBtn.classList.remove("disabled");
     transcript.textContent = "Ready ✨";
   } catch (err) {
     console.error(err);
+    translatorState = "failed";
+    keyboardBtn.classList.add("disabled");
     transcript.textContent = "FAILED";
   }
 }
@@ -143,10 +161,16 @@ loadTranslator();
 keyboardBtn.addEventListener("click", (e) => {
   e.stopPropagation();
 
+  if (translatorState !== "ready") {
+    flashLine(translatorState === "failed" ? "#EF4444" : "#FACC15");
+    return;
+  }
+
   inputPanel.classList.add("show");
   horizon.classList.add("raise");
 
   transcript.style.visibility = "hidden";
+  transcript.textContent = "";
   inputBox.focus();
 });
 
@@ -183,7 +207,7 @@ translateBtn.addEventListener("click", async () => {
 
   line.classList.add("loading");
   translated.textContent = "";
-  transcript.textContent = text;
+  transcript.textContent = `Translate: ${text}`;
 
   translateBtn.disabled = true;
   keyboardBtn.disabled = true;
@@ -230,7 +254,7 @@ translateBtn.addEventListener("click", async () => {
 
     inputBox.value = "";
     transcript.style.visibility = "visible";
-    transcript.textContent = "";
+    transcript.textContent = text;
 
     line.style.background = "rgba(56,189,248,.45)";
     line.style.boxShadow = "0 0 12px rgba(56,189,248,.25)";
