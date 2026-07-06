@@ -205,20 +205,21 @@ translateBtn.addEventListener("click", async () => {
 
   const tgt_lang = targetMap[mode];
 
-  line.classList.add("loading");
+  // Update the UI first, since the model call below blocks the main thread
   translated.textContent = "";
   transcript.textContent = `Translate: ${text}`;
+  keyboardBtn.classList.add("translating");
 
   translateBtn.disabled = true;
   keyboardBtn.disabled = true;
 
   try {
-    await new Promise((r) => setTimeout(r, 30));
-
     inputPanel.classList.remove("show");
     horizon.classList.remove("raise");
     inputBox.blur();
 
+    // Give the browser a couple frames to actually paint the changes above
+    // before the synchronous/blocking translation work starts
     await new Promise(requestAnimationFrame);
     await new Promise((r) => setTimeout(r, 300));
 
@@ -271,7 +272,7 @@ translateBtn.addEventListener("click", async () => {
     line.style.background = "#EF4444";
     line.style.boxShadow = "0 0 12px #EF4444";
   } finally {
-    line.classList.remove("loading");
+    keyboardBtn.classList.remove("translating");
     translateBtn.disabled = false;
     keyboardBtn.disabled = false;
   }

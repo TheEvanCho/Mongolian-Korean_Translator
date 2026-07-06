@@ -214,6 +214,11 @@ body {
   animation: loadingPulse 1s infinite;
 }
 
+#keyboardBtn.translating {
+  animation: loadingPulse 1s infinite;
+  color: white;
+}
+
 #deepBtn {
   padding: 16px 18px;
   border-radius: 999px;
