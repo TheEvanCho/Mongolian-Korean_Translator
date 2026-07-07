@@ -142,17 +142,20 @@ async function loadTranslator() {
     transcript.textContent = "Loading translator...";
     console.log("Loading model...");
 
+    console.log("starting pipeline...");
     translator = await pipeline(
       "translation",
       "Xenova/nllb-200-distilled-600M",
     );
-
+    console.log("Pipeline loaded!");
     console.log("Loaded!", translator);
     translatorState = "ready";
     keyboardBtn.classList.remove("disabled");
     transcript.textContent = "Ready ✨";
   } catch (err) {
-    console.error(err);
+    console.log("ERROR OBJECT:");
+    console.log(err);
+    console.log(err.cause);
     console.log(err.name);
     console.log(err.message);
     console.log(err.stack);
