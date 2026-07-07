@@ -153,9 +153,12 @@ async function loadTranslator() {
     transcript.textContent = "Ready ✨";
   } catch (err) {
     console.error(err);
+    console.log(err.name);
+    console.log(err.message);
+    console.log(err.stack);
     translatorState = "failed";
     keyboardBtn.classList.add("disabled");
-    transcript.textContent = "FAILED";
+    transcript.textContent = err.message;
   }
 }
 
@@ -326,9 +329,10 @@ swap.addEventListener("click", (e) => {
 
 /* =========================
    SERVICE WORKER
-========================= */
+========================= 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("service-worker.js")
     .then(() => console.log("Service Worker registered!"));
 }
+*/
