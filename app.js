@@ -6,6 +6,15 @@ import {
 env.allowLocalModels = false;
 env.allowRemoteModels = true;
 
+const isIOS = // CHECK IOS
+  /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); // Check iPad pretending to be Mac Intel
+
+const MODEL = isIOS ? null : "Xenova/nllb-200-distilled-600M";
+
+console.log("iOS:", isIOS);
+console.log("Model:", MODEL);
+
 let translator;
 let deepThinking = true;
 
@@ -143,10 +152,17 @@ async function loadTranslator() {
     console.log("Loading model...");
 
     console.log("starting pipeline...");
-    translator = await pipeline(
-      "translation",
-      "Xenova/nllb-200-distilled-600M",
-    );
+    if (!MODEL) {
+      console.log("iOS detected - skipping NLLB loading");
+
+      translatorState = "failed";
+      keyboardBtn.classList.add("disabled");
+      transcript.textContent = "iOS mode: lightweight translator needed";
+
+      return;
+    }
+
+    translator = await pipeline("translation", MODEL);
     console.log("Pipeline loaded!");
     console.log("Loaded!", translator);
     translatorState = "ready";
