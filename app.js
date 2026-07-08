@@ -33,25 +33,25 @@ let translatorManager = {
       this.engine = null;
       this.type = "custom";
       return;
-      
-      try {
-        this.engine = await loadNLLB();
-        this.type = "nllb";
-      } catch (e) {
-        console.warn("NLLB failed, using custom");
-        this.type = "custom";
-      }
-    },
-    
-    async translate(text, target) {
-      switch (this.type) {
-        case "nllb":
-          return await translateNLLB(this.engine, text, target);
-          
-          case "small":
-            return await translateSmall(this.engine, text, target);
-            
-          }
+    }
+
+    try {
+      this.engine = await loadNLLB();
+      this.type = "nllb";
+    } catch (e) {
+      console.warn("NLLB failed, using custom");
+      this.type = "custom";
+    }
+  },
+
+  async translate(text, target) {
+    switch (this.type) {
+      case "nllb":
+        return await translateNLLB(this.engine, text, target);
+
+      case "small":
+        return await translateSmall(this.engine, text, target);
+
       case "custom":
         return await translateCustom(text, target);
 
@@ -191,19 +191,16 @@ const tutorial = document.getElementById("tutorial");
 const tutorialBtn = document.getElementById("tutorialBtn");
 const tutorialClose = document.getElementById("tutorialClose");
 
-
 // show only first time
 if (!localStorage.getItem("tutorialSeen")) {
   tutorial.classList.add("show");
 }
-
 
 tutorialClose.addEventListener("click", () => {
   tutorial.classList.remove("show");
 
   localStorage.setItem("tutorialSeen", "true");
 });
-
 
 tutorialBtn.addEventListener("click", () => {
   tutorial.classList.add("show");
