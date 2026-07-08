@@ -471,29 +471,7 @@ translateBtn.addEventListener("click", async () => {
 
       if (results && results.length) {
         translated.innerHTML = results
-          .map((x, i) => {
-            const words = x.translation
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean);
-
-            const main = words[0] || "";
-            const others = words.slice(1).join(", ");
-
-            const info = [x.pos, x.cefr]
-              .filter(Boolean)
-              .join(" • ")
-              .replaceAll("/", " • ");
-
-            return `
-                <div class="dictEntry">
-                  <div class="dictQuery">${x.word}</div>
-                  <div class="dictMain">${main}</div>
-                  ${others ? `<div class="dictAlt">${others}</div>` : ""}
-                  ${info ? `<div class="dictInfo">${info}</div>` : ""}</div>
-                </div>
-              `;
-          })
+          .map((result) => renderDictionaryResult(result, inputLanguage))
           .join("");
       } else {
         translated.textContent = "No dictionary result.";
