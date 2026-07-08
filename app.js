@@ -390,7 +390,7 @@ flipBtn.addEventListener("click", () => {
 /* =========================
    TRANSLATE CORE
 ========================= */
-function renderDictionaryResult(result, reverse = false) {
+function renderDictionaryResult(result, inputLanguage) {
   const words = result.translation
     .split(",")
     .map((s) => s.trim())
@@ -403,26 +403,25 @@ function renderDictionaryResult(result, reverse = false) {
 
   let title, main, others;
 
-  if (!reverse) {
-    title = result.word;
-    main = words[0] || "";
+  if (inputLanguage === "ko") {
+    // User typed Korean
+    title = result.word; // Korean (small)
+    main = words[0] || ""; // Mongolian (large)
     others = words.slice(1);
   } else {
-    title = words[0] || "";
-    main = result.word;
+    // User typed Mongolian
+    title = result.word; // Mongolian (small)
+    main = words[0] || ""; // Korean (large)
     others = words.slice(1);
   }
 
   return `
     <div class="dictEntry">
       <div class="dictQuery">${title}</div>
-
       <div class="dictMain">${main}</div>
-
       ${
         others.length ? `<div class="dictAlt">${others.join("<br>")}</div>` : ""
       }
-
       ${info ? `<div class="dictInfo">${info}</div>` : ""}
     </div>
   `;
@@ -436,6 +435,8 @@ translateBtn.addEventListener("click", async () => {
 
   const text = inputBox.value.trim();
   if (!text) return;
+
+  const inputLanguage = /[\uAC00-\uD7A3]/.test(text) ? "ko" : "mn";
 
   const tgt_lang = targetMap[mode];
 
@@ -533,7 +534,7 @@ translateBtn.addEventListener("click", async () => {
       const reverse = searchLang === "ko";
 
       translated.innerHTML = matches
-        .map((match) => renderDictionaryResult(match, reverse))
+        .map((match) => renderDictionaryResult(match, inputLanguage))
         .join("");
     } else {
       translated.textContent = finalText;
