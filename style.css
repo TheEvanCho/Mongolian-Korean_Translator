@@ -329,3 +329,23 @@ body {
   width: min(90%, 400px);
   text-align: center;
 }
+
+.tutorialBtn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: rgba(56, 189, 248, 0.8);
+  color: white;
+
+  font-size: 24px;
+  font-weight: bold;
+
+  z-index: 9999;
+}

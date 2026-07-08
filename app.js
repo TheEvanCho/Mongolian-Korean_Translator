@@ -23,35 +23,35 @@ let translatorManager = {
   async load() {
     if (isIOS) {
       try {
-        this.engine = await loadSmallModel();
         this.type = "small";
         return;
       } catch (e) {
+        this.engine = await loadSmallModel();
         console.warn("Small model failed", e);
       }
 
       this.engine = null;
       this.type = "custom";
       return;
-    }
-
-    try {
-      this.engine = await loadNLLB();
-      this.type = "nllb";
-    } catch (e) {
-      console.warn("NLLB failed, using custom");
-      this.type = "custom";
-    }
-  },
-
-  async translate(text, target) {
-    switch (this.type) {
-      case "nllb":
-        return await translateNLLB(this.engine, text, target);
-
-      case "small":
-        return await translateSmall(this.engine, text, target);
-
+      
+      try {
+        this.engine = await loadNLLB();
+        this.type = "nllb";
+      } catch (e) {
+        console.warn("NLLB failed, using custom");
+        this.type = "custom";
+      }
+    },
+    
+    async translate(text, target) {
+      switch (this.type) {
+        case "nllb":
+          return await translateNLLB(this.engine, text, target);
+          
+          case "small":
+            return await translateSmall(this.engine, text, target);
+            
+          }
       case "custom":
         return await translateCustom(text, target);
 
@@ -188,17 +188,26 @@ xmlns="http://www.w3.org/2000/svg">
 </svg>`;
 
 const tutorial = document.getElementById("tutorial");
+const tutorialBtn = document.getElementById("tutorialBtn");
 const tutorialClose = document.getElementById("tutorialClose");
 
-if (localStorage.getItem("tutorialSeen")) {
-  tutorial.style.display = "none";
+
+// show only first time
+if (!localStorage.getItem("tutorialSeen")) {
+  tutorial.classList.add("show");
 }
 
+
 tutorialClose.addEventListener("click", () => {
-  tutorial.style.display = "none";
+  tutorial.classList.remove("show");
+
   localStorage.setItem("tutorialSeen", "true");
 });
 
+
+tutorialBtn.addEventListener("click", () => {
+  tutorial.classList.add("show");
+});
 /* =========================
    LOAD MODEL
 ========================= */
