@@ -220,19 +220,53 @@ async function loadDictionary() {
 }
 
 function searchDictionary(word, language) {
-  let dictionary = language === "ko" ? koreanDictionary : mongolianDictionary;
+  const dictionary = language === "ko" ? koreanDictionary : mongolianDictionary;
 
-  const first = word[0];
+  // Remove punctuation and extra spaces
+  word = word
+    .trim()
+    .replace(/[.,!?;:()[\]{}"']/g, "")
+    .replace(/\s+/g, " ");
 
-  if (!dictionary[first]) {
-    return null;
+  const found = [];
+  const seen = new Set();
+
+  for (let len = word.length; len >= 1; len--) {
+    const query = word.slice(0, len).trim();
+    if (!query) continue;
+
+    const first = query[0];
+    if (!dictionary[first]) continue;
+
+    for (const item of dictionary[first]) {
+      let score = -1;
+
+      if (item.word === query) {
+        score = 100 + query.length;
+      } else if (item.word.startsWith(query)) {
+        score = 80 + query.length;
+      } else if (item.translation.includes(query)) {
+        score = 60 + query.length;
+      }
+
+      if (score < 0) continue;
+
+      const key = `${item.word}|${item.translation}`;
+
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      found.push({
+        ...item,
+        matched: query,
+        score,
+      });
+    }
   }
 
-  const results = dictionary[first].filter(
-    (item) => item.word === word || item.translation.includes(word),
-  );
+  found.sort((a, b) => b.score - a.score);
 
-  return results;
+  return found;
 }
 
 async function loadNLLB() {
@@ -356,6 +390,35 @@ flipBtn.addEventListener("click", () => {
 /* =========================
    TRANSLATE CORE
 ========================= */
+function renderDictionaryResult(result) {
+  const words = result.translation
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const main = words[0] || "";
+  const others = words.slice(1);
+
+  const info = [result.pos, result.cefr]
+    .filter(Boolean)
+    .join(" • ")
+    .replaceAll("/", " • ");
+
+  return `
+    <div class="dictEntry">
+      <div class="dictQuery">${result.word}</div>
+
+      <div class="dictMain">${main}</div>
+
+      ${
+        others.length ? `<div class="dictAlt">${others.join("<br>")}</div>` : ""
+      }
+
+      ${info ? `<div class="dictInfo">${info}</div>` : ""}
+    </div>
+  `;
+}
+
 translateBtn.addEventListener("click", async () => {
   if (translatorState !== "ready") {
     transcript.textContent = "Translator not ready.";
@@ -412,7 +475,10 @@ translateBtn.addEventListener("click", async () => {
         ${i === 0 ? `<div class="dictQuery">${x.word}</div>` : ""}
         <div class="dictMain">${main}</div>
         ${others ? `<div class="dictAlt">${others}</div>` : ""}
-        <div class="dictInfo">${x.pos} ${x.cefr}</div>
+        <div class="dictInfo">const info = [x.pos, x.cefr]
+  .filter(Boolean)
+  .join(" • ")
+  .replaceAll("/", " • ");</div>
       </div>
     `;
           })
@@ -444,9 +510,22 @@ translateBtn.addEventListener("click", async () => {
       finalText = result[0].translation_text;
     }
 
-    translated.textContent = finalText;
+    const searchLang = /[\u0400-\u04FF]/.test(finalText) ? "mn" : "ko";
+
+    const matches = searchDictionary(finalText, searchLang);
+
+    if (matches.length) {
+      translated.innerHTML = matches
+        .slice(0, 5)
+        .map(renderDictionaryResult)
+        .join("");
+    } else {
+      translated.textContent = finalText;
+    }
 
     inputBox.value = "";
+    transcript.style.visibility = "visible";
+    transcript.textContent = text;
     transcript.style.visibility = "visible";
     transcript.textContent = text;
 
