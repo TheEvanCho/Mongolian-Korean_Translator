@@ -3,20 +3,66 @@ import {
   env,
 } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
 
-env.allowLocalModels = false;
+env.allowLocalModels = true;
 env.allowRemoteModels = true;
 
 const isIOS = // CHECK IOS
   /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); // Check iPad pretending to be Mac Intel
 
-const MODEL = isIOS ? null : "Xenova/nllb-200-distilled-600M";
+const DEVICE = isIOS ? "ios" : "desktop";
+
+console.log("Device:", DEVICE);
 
 console.log("iOS:", isIOS);
 console.log("Model:", MODEL);
 
-let translator;
-let deepThinking = true;
+let translatorManager = {
+  engine: null,
+  type: null,
+
+  async load() {
+    if (isIOS) {
+      try {
+        this.engine = await loadSmallModel();
+        this.type = "small";
+        return;
+      } catch (e) {
+        console.warn("Small model failed", e);
+      }
+
+      this.engine = null;
+      this.type = "custom";
+      return;
+    }
+
+    try {
+      this.engine = await loadNLLB();
+      this.type = "nllb";
+    } catch (e) {
+      console.warn("NLLB failed, using custom");
+      this.type = "custom";
+    }
+  },
+
+  async translate(text, target) {
+    switch (this.type) {
+      case "nllb":
+        return await translateNLLB(this.engine, text, target);
+
+      case "small":
+        return await translateSmall(this.engine, text, target);
+
+      case "custom":
+        return await translateCustom(text, target);
+
+      default:
+        throw new Error("No translator loaded");
+    }
+  },
+};
+
+let translateMode = "deep";
 
 const app = document.getElementById("app");
 const keyboardBtn = document.getElementById("keyboardBtn");
@@ -33,6 +79,10 @@ const translateBtn = document.getElementById("translateBtn");
 
 const deepBtn = document.getElementById("deepBtn");
 const flipBtn = document.getElementById("flipBtn");
+
+let koreanDictionary = {};
+let mongolianDictionary = {};
+
 let flipped = false;
 let mode = "AUTO → Монгол";
 
@@ -129,6 +179,16 @@ C226.066,284.671,219.35,277.954,211.066,277.954z"/>
 c-5.857-5.857-15.355-5.857-21.213,0l-33.098,33.098c-10.447,0.662-18.723,9.32-18.723,19.934
 c-0.002,11.045,8.951,20,19.998,20.002l0,0C164.998,216.89,164.998,216.89,165,216.89z"/> 
 </svg>`;
+
+const BOOK_ICON = `<svg 
+width="800px" 
+height="800px" 
+viewBox="0 0 24 24" 
+fill="none" 
+xmlns="http://www.w3.org/2000/svg">
+<path d="M4 19V6.2C4 5.0799 4 4.51984 4.21799 4.09202C4.40973 3.71569 4.71569 3.40973 5.09202 3.21799C5.51984 3 6.0799 3 7.2 3H16.8C17.9201 3 18.4802 3 18.908 3.21799C19.2843 3.40973 19.5903 3.71569 19.782 4.09202C20 4.51984 20 5.0799 20 6.2V17H6C4.89543 17 4 17.8954 4 19ZM4 19C4 20.1046 4.89543 21 6 21H20M9 7H15M9 11H15M19 17V21" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
 /* =========================
    LOAD MODEL
 ========================= */
@@ -144,39 +204,101 @@ function flashLine(color) {
   }, 400);
 }
 
+async function loadDictionary() {
+  console.log("Loading dictionary...");
+
+  const ko = await fetch("DictionaryData/korean_dictionary.json");
+
+  const mn = await fetch("DictionaryData/mongolian_dictionary.json");
+
+  koreanDictionary = await ko.json();
+  mongolianDictionary = await mn.json();
+
+  console.log(
+    "Dictionary loaded",
+    Object.keys(koreanDictionary).length,
+    Object.keys(mongolianDictionary).length,
+  );
+}
+
+function searchDictionary(word, language) {
+  let dictionary = language === "ko" ? koreanDictionary : mongolianDictionary;
+
+  const first = word[0];
+
+  if (!dictionary[first]) {
+    return null;
+  }
+
+  const results = dictionary[first].filter(
+    (item) => item.word === word || item.translation.includes(word),
+  );
+
+  return results;
+}
+
+async function loadNLLB() {
+  return await pipeline("translation", "Xenova/nllb-200-distilled-600M");
+}
+
+async function loadSmallModel() {
+  console.log("Loading small offline model");
+
+  // temporary placeholder
+  // replace this later with your small model
+
+  return {
+    name: "small-model",
+  };
+}
+
+async function translateNLLB(model, text, target) {
+  return await model(text, {
+    tgt_lang: target,
+  });
+}
+
+async function translateSmall(model, text, target) {
+  console.log("small model placeholder");
+
+  return [
+    {
+      translation_text: "small model result",
+    },
+  ];
+}
+
+async function translateCustom(text, target) {
+  return [
+    {
+      translation_text: "custom translator result",
+    },
+  ];
+}
+
 async function loadTranslator() {
   try {
     translatorState = "loading";
+
     keyboardBtn.classList.add("disabled");
     transcript.textContent = "Loading translator...";
-    console.log("Loading model...");
 
-    console.log("starting pipeline...");
-    if (!MODEL) {
-      console.log("iOS detected - skipping NLLB loading");
+    await translatorManager.load();
 
-      translatorState = "failed";
-      keyboardBtn.classList.add("disabled");
-      transcript.textContent = "iOS mode: lightweight translator needed";
+    await loadDictionary();
 
-      return;
-    }
-
-    translator = await pipeline("translation", MODEL);
-    console.log("Pipeline loaded!");
-    console.log("Loaded!", translator);
     translatorState = "ready";
+
     keyboardBtn.classList.remove("disabled");
-    transcript.textContent = "Ready ✨";
+
+    transcript.textContent = `Ready ✨ (${translatorManager.type})`;
   } catch (err) {
-    console.log("ERROR OBJECT:");
-    console.log(err);
-    console.log(err.cause);
-    console.log(err.name);
-    console.log(err.message);
-    console.log(err.stack);
+    console.error(err);
+
     translatorState = "failed";
+
     keyboardBtn.classList.add("disabled");
+
     transcript.textContent = err.message;
   }
 }
@@ -206,12 +328,26 @@ keyboardBtn.addEventListener("click", (e) => {
    DEEP THINKING TOGGLE
 ========================= */
 
-deepBtn.innerHTML = BRAIN_ICON; // initial icon since deepThinking = true
+const modeIcons = {
+  deep: BRAIN_ICON,
+  fast: SPEED_ICON,
+  dictionary: BOOK_ICON,
+};
+
+deepBtn.innerHTML = modeIcons[translateMode];
 
 deepBtn.addEventListener("click", () => {
-  deepThinking = !deepThinking;
+  if (translateMode === "deep") {
+    translateMode = "fast";
+  } else if (translateMode === "fast") {
+    translateMode = "dictionary";
+  } else {
+    translateMode = "deep";
+  }
 
-  deepBtn.innerHTML = deepThinking ? BRAIN_ICON : SPEED_ICON;
+  deepBtn.innerHTML = modeIcons[translateMode];
+
+  console.log("Mode:", translateMode);
 });
 
 flipBtn.addEventListener("click", () => {
@@ -223,8 +359,8 @@ flipBtn.addEventListener("click", () => {
    TRANSLATE CORE
 ========================= */
 translateBtn.addEventListener("click", async () => {
-  if (!translator) {
-    transcript.textContent = "Translator model not available.";
+  if (translatorState !== "ready") {
+    transcript.textContent = "Translator not ready.";
     return;
   }
 
@@ -253,28 +389,42 @@ translateBtn.addEventListener("click", async () => {
 
     let finalText = text;
 
+    if (translateMode === "dictionary") {
+      let results;
+
+      if (/[\uAC00-\uD7A3]/.test(text)) {
+        results = searchDictionary(text, "ko");
+      } else {
+        results = searchDictionary(text, "mn");
+      }
+
+      if (results && results.length) {
+        translated.textContent = results
+          .map((x) => `${x.word}\n${x.translation}\n${x.pos} ${x.cefr}`)
+          .join("\n\n");
+      } else {
+        translated.textContent = "No dictionary result.";
+      }
+
+      return;
+    }
+
     /* =========================
        🧠 DEEP THINKING MODE
     ========================= */
-    if (deepThinking) {
+    if (translateMode === "deep") {
       // Step 1: input → English
-      const toEnglish = await translator(text, {
-        tgt_lang: "eng_Latn",
-      });
+      const toEnglish = await translatorManager.translate(text, "eng_Latn");
 
       const english = toEnglish[0].translation_text;
 
       // Step 2: English → target
-      const finalResult = await translator(english, {
-        tgt_lang,
-      });
+      const finalResult = await translatorManager.translate(english, tgt_lang);
 
       finalText = finalResult[0].translation_text;
-    } else {
+    } else if (translateMode === "fast") {
       // Direct translation
-      const result = await translator(text, {
-        tgt_lang,
-      });
+      const result = await translatorManager.translate(text, tgt_lang);
 
       finalText = result[0].translation_text;
     }
