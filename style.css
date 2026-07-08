@@ -315,11 +315,15 @@ body {
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(10px);
 
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
 
   z-index: 9999;
+}
+
+.tutorial.show {
+  display: flex;
 }
 
 .tutorialCard {
