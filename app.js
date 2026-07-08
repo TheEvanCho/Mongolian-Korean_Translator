@@ -532,7 +532,14 @@ translateBtn.addEventListener("click", async () => {
 
     if (matches.length) {
       const reverse = searchLang === "ko";
+      const inputLanguage = /[\uAC00-\uD7A3]/.test(text) ? "ko" : "mn";
 
+      console.log("Input language:", inputLanguage);
+      console.log("Dictionary searched:", searchLang);
+      console.log(
+        "Large language should be:",
+        inputLanguage === "ko" ? "mn" : "ko",
+      );
       translated.innerHTML = matches
         .map((match) => renderDictionaryResult(match, inputLanguage))
         .join("");
