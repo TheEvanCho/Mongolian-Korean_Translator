@@ -330,7 +330,7 @@ body {
   background: white;
   border-radius: 24px;
   padding: 30px;
-  width: min(90%, 400px);
+  width: 80%;
   text-align: center;
 }
 
