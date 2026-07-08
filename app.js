@@ -295,7 +295,8 @@ async function translateSmall(model, text, target) {
 
   return [
     {
-      translation_text: "small model result",
+      translation_text:
+        "iOS에서는 ML모델을 사용할 수 없습니다. 사전 모드를 사용하세요.",
     },
   ];
 }
