@@ -101,6 +101,34 @@ body {
   justify-content: center;
 }
 
+.swapBtn {
+  position: relative;
+  z-index: 2;
+
+  padding: 16px 22px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+
+  width: 100px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .mic {
   width: 58px;
   height: 58px;
