@@ -390,23 +390,32 @@ flipBtn.addEventListener("click", () => {
 /* =========================
    TRANSLATE CORE
 ========================= */
-function renderDictionaryResult(result) {
+function renderDictionaryResult(result, reverse = false) {
   const words = result.translation
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-
-  const main = words[0] || "";
-  const others = words.slice(1);
 
   const info = [result.pos, result.cefr]
     .filter(Boolean)
     .join(" • ")
     .replaceAll("/", " • ");
 
+  let title, main, others;
+
+  if (!reverse) {
+    title = result.word;
+    main = words[0] || "";
+    others = words.slice(1);
+  } else {
+    title = words[0] || "";
+    main = result.word;
+    others = words.slice(1);
+  }
+
   return `
     <div class="dictEntry">
-      <div class="dictQuery">${result.word}</div>
+      <div class="dictQuery">${title}</div>
 
       <div class="dictMain">${main}</div>
 
@@ -489,6 +498,10 @@ translateBtn.addEventListener("click", async () => {
         translated.textContent = "No dictionary result.";
       }
 
+      inputBox.value = "";
+      transcript.style.visibility = "visible";
+      transcript.textContent = text;
+
       return;
     }
 
@@ -517,14 +530,16 @@ translateBtn.addEventListener("click", async () => {
     const matches = searchDictionary(finalText, searchLang);
 
     if (matches.length) {
-      translated.innerHTML = matches.map(renderDictionaryResult).join("");
+      const reverse = searchLang === "ko";
+
+      translated.innerHTML = matches
+        .map((match) => renderDictionaryResult(match, reverse))
+        .join("");
     } else {
       translated.textContent = finalText;
     }
 
     inputBox.value = "";
-    transcript.style.visibility = "visible";
-    transcript.textContent = text;
     transcript.style.visibility = "visible";
     transcript.textContent = text;
 
