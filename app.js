@@ -266,7 +266,7 @@ function searchDictionary(word, language) {
 
   found.sort((a, b) => b.score - a.score);
 
-  return found;
+  return found.slice(0, 10);
 }
 
 async function loadNLLB() {
@@ -470,17 +470,19 @@ translateBtn.addEventListener("click", async () => {
             const main = words[0] || "";
             const others = words.slice(1).join(", ");
 
+            const info = [x.pos, x.cefr]
+              .filter(Boolean)
+              .join(" • ")
+              .replaceAll("/", " • ");
+
             return `
-      <div class="dictEntry">
-        ${i === 0 ? `<div class="dictQuery">${x.word}</div>` : ""}
-        <div class="dictMain">${main}</div>
-        ${others ? `<div class="dictAlt">${others}</div>` : ""}
-        <div class="dictInfo">const info = [x.pos, x.cefr]
-  .filter(Boolean)
-  .join(" • ")
-  .replaceAll("/", " • ");</div>
-      </div>
-    `;
+                <div class="dictEntry">
+                  <div class="dictQuery">${x.word}</div>
+                  <div class="dictMain">${main}</div>
+                  ${others ? `<div class="dictAlt">${others}</div>` : ""}
+                  ${info ? `<div class="dictInfo">${info}</div>` : ""}</div>
+                </div>
+              `;
           })
           .join("");
       } else {
@@ -515,10 +517,7 @@ translateBtn.addEventListener("click", async () => {
     const matches = searchDictionary(finalText, searchLang);
 
     if (matches.length) {
-      translated.innerHTML = matches
-        .slice(0, 5)
-        .map(renderDictionaryResult)
-        .join("");
+      translated.innerHTML = matches.map(renderDictionaryResult).join("");
     } else {
       translated.textContent = finalText;
     }
