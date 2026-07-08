@@ -276,35 +276,3 @@ body {
   height: 26px;
   pointer-events: none;
 }
-
-.dictEntry {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.dictQuery {
-  font-size: 15px;
-  color: #9ca3af;
-  font-weight: 400;
-}
-
-.dictMain {
-  font-size: 34px;
-  font-weight: 500;
-  color: #111827;
-  line-height: 1.15;
-}
-
-.dictAlt {
-  font-size: 18px;
-  color: #9ca3af;
-  line-height: 1.25;
-}
-
-.dictInfo {
-  margin-top: 6px;
-  font-size: 14px;
-  color: #9ca3af;
-}
